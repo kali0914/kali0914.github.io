@@ -81,26 +81,6 @@
             font-weight: bold;
         }
         
-        .bg-morning-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
-        }
-        
-        .bg-noon-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1464278533981-50106e6176b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
-        }
-        
-        .bg-afternoon-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
-        }
-        
-        .bg-evening-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
-        }
-        
-        .bg-night-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
-        }
-        
         /* 加载动画 */
         .loading-overlay {
             position: fixed;
@@ -137,6 +117,55 @@
             font-size: 1.2rem;
             letter-spacing: 2px;
             text-align: center;
+        }
+        
+        /* 天气卡片 */
+        .weather-card {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(26, 31, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 40px;
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #fff;
+            font-size: 1rem;
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: opacity 0.5s;
+        }
+        
+        .weather-card.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .weather-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+        }
+        
+        .weather-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .weather-location {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .weather-temp {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--blue), var(--green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         #home-page {
@@ -626,6 +655,7 @@
             .profile-info h2 { font-size: 1.8rem; }
             .contact-btn { min-width: 100%; }
             .home-quote { font-size: 1.2rem; padding: 20px; }
+            .weather-card { top: 10px; right: 10px; padding: 8px 15px; font-size: 0.9rem; }
         }
         
         @media (max-width: 480px) {
@@ -634,15 +664,23 @@
             .circular-action-btn { width: 100px; height: 100px; font-size: 1rem; }
             .security-tips-list { grid-template-columns: 1fr; }
             .music-player-btn { width: 55px; height: 55px; font-size: 1.5rem; bottom: 20px; right: 20px; }
+            .weather-card { display: none; }
         }
     </style>
 </head>
-<body class="bg-morning-mountain">
-    <!-- 加载动画 -->
+<body>
     <div class="loading-overlay" id="loadingOverlay">
         <div style="display: flex; flex-direction: column; align-items: center;">
             <div class="loading-spinner"></div>
             <div class="loading-text">准备中...</div>
+        </div>
+    </div>
+
+    <div class="weather-card hidden" id="weatherCard">
+        <div class="weather-icon" id="weatherIcon"><i class="fas fa-cloud-sun"></i></div>
+        <div class="weather-info">
+            <div class="weather-location" id="weatherLocation">北京市朝阳区</div>
+            <div class="weather-temp" id="weatherTemp">12°C</div>
         </div>
     </div>
 
@@ -767,7 +805,7 @@
             }
         };
 
-        // 200句真实人物名言（真人姓名）
+        // 200句真实人物名言（完整版）
         const quoteLibrary = [
             { text: "学而时习之，不亦说乎。", author: "孔子" },
             { text: "三人行，必有我师焉。择其善者而从之，其不善者而改之。", author: "孔子" },
@@ -967,6 +1005,38 @@
             { text: "道之将行也与，命也；道之将废也与，命也。", author: "孔子" }
         ];
 
+        // 随机背景图库
+        const backgroundImages = {
+            morning: [
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            noon: [
+                'https://images.unsplash.com/photo-1464278533981-50106e6176b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            afternoon: [
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1505765050516-f72dcac9c60e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            evening: [
+                'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            night: [
+                'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1507400492013-162706c8c05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1472745433479-4556f22e32c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ]
+        };
+
+        // 天气API配置（已填入您的密钥）
+        const WEATHER_API_KEY = '3dec342311d0bdf45663c064f19650b5';
+
         let currentSettings = {...defaultSettings};
         
         const homePage = document.getElementById('home-page');
@@ -995,6 +1065,11 @@
         const quoteText = document.getElementById('quoteText');
         const quoteAuthor = document.getElementById('quoteAuthor');
         
+        const weatherCard = document.getElementById('weatherCard');
+        const weatherIcon = document.getElementById('weatherIcon');
+        const weatherLocation = document.getElementById('weatherLocation');
+        const weatherTemp = document.getElementById('weatherTemp');
+        
         function hideLoading() {
             loadingOverlay.style.opacity = '0';
             setTimeout(() => {
@@ -1011,7 +1086,6 @@
             initMusicPlayer();
             setInterval(updateBackgroundByLocalTime, 3600000);
             
-            // 设置一个最大加载时间（5秒），防止无限加载
             setTimeout(() => {
                 if (loadingOverlay.style.display !== 'none') {
                     hideLoading();
@@ -1034,33 +1108,50 @@
                     const now = new Date();
                     const localTimeStr = now.toLocaleString('zh-CN', { timeZone: timezone, hour12: false });
                     const localHour = new Date(localTimeStr).getHours();
-                    updateBackgroundByHour(localHour);
+                    
+                    setRandomBackgroundByHour(localHour);
+                    
                     window.userTimezone = timezone;
+                    
+                    if (WEATHER_API_KEY && data.latitude && data.longitude) {
+                        fetchWeather(data.latitude, data.longitude, data.city, data.region);
+                    } else {
+                        weatherCard.classList.add('hidden');
+                    }
+                    
                     hideLoading();
                 })
                 .catch(error => {
                     console.error('IP定位失败，使用系统时间', error);
                     const localHour = new Date().getHours();
-                    updateBackgroundByHour(localHour);
+                    setRandomBackgroundByHour(localHour);
+                    weatherCard.classList.add('hidden');
                     hideLoading();
                 });
         }
         
-        function updateBackgroundByHour(hour) {
-            let bgClass = '';
+        function setRandomBackgroundByHour(hour) {
+            let period;
             if (hour >= 5 && hour < 9) {
-                bgClass = 'bg-morning-mountain';
+                period = 'morning';
             } else if (hour >= 9 && hour < 12) {
-                bgClass = 'bg-noon-mountain';
+                period = 'noon';
             } else if (hour >= 12 && hour < 17) {
-                bgClass = 'bg-afternoon-mountain';
+                period = 'afternoon';
             } else if (hour >= 17 && hour < 20) {
-                bgClass = 'bg-evening-mountain';
+                period = 'evening';
             } else {
-                bgClass = 'bg-night-mountain';
+                period = 'night';
             }
-            document.body.className = '';
-            document.body.classList.add(bgClass);
+            
+            const images = backgroundImages[period];
+            const randomIndex = Math.floor(Math.random() * images.length);
+            const selectedImage = images[randomIndex];
+            
+            document.body.style.backgroundImage = `linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('${selectedImage}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundAttachment = 'fixed';
         }
         
         function updateBackgroundByLocalTime() {
@@ -1068,11 +1159,52 @@
                 const now = new Date();
                 const localTimeStr = now.toLocaleString('zh-CN', { timeZone: window.userTimezone, hour12: false });
                 const localHour = new Date(localTimeStr).getHours();
-                updateBackgroundByHour(localHour);
+                setRandomBackgroundByHour(localHour);
             } else {
                 const localHour = new Date().getHours();
-                updateBackgroundByHour(localHour);
+                setRandomBackgroundByHour(localHour);
             }
+        }
+        
+        function fetchWeather(lat, lon, city, region) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=zh_cn`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod === 200) {
+                        const temp = Math.round(data.main.temp);
+                        const iconCode = data.weather[0].icon;
+                        
+                        let locationStr = city;
+                        if (region && region !== city) {
+                            locationStr = `${region} ${city}`;
+                        }
+                        weatherLocation.textContent = locationStr;
+                        weatherTemp.textContent = `${temp}°C`;
+                        
+                        const iconMap = {
+                            '01d': 'fa-sun', '01n': 'fa-moon',
+                            '02d': 'fa-cloud-sun', '02n': 'fa-cloud-moon',
+                            '03d': 'fa-cloud', '03n': 'fa-cloud',
+                            '04d': 'fa-cloud', '04n': 'fa-cloud',
+                            '09d': 'fa-cloud-rain', '09n': 'fa-cloud-rain',
+                            '10d': 'fa-cloud-sun-rain', '10n': 'fa-cloud-moon-rain',
+                            '11d': 'fa-cloud-bolt', '11n': 'fa-cloud-bolt',
+                            '13d': 'fa-snowflake', '13n': 'fa-snowflake',
+                            '50d': 'fa-smog', '50n': 'fa-smog'
+                        };
+                        const iconClass = iconMap[iconCode] || 'fa-cloud-sun';
+                        weatherIcon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+                        
+                        weatherCard.classList.remove('hidden');
+                    } else {
+                        weatherCard.classList.add('hidden');
+                    }
+                })
+                .catch(() => {
+                    weatherCard.classList.add('hidden');
+                });
         }
         
         function setupRightClickProtection() {
