@@ -119,57 +119,6 @@
             text-align: center;
         }
         
-        /* 天气卡片 - 全透明无边框 */
-        .weather-card {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            backdrop-filter: none;
-            padding: 8px 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #fff;
-            font-size: 1rem;
-            z-index: 100;
-            transition: opacity 0.5s;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-        
-        .weather-card.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .weather-icon {
-            font-size: 2rem;
-            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
-        }
-        
-        .weather-info {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.3;
-        }
-        
-        .weather-location {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.9);
-        }
-        
-        .weather-temp {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--blue), var(--green));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
         #home-page {
             display: none;
             min-height: 100vh;
@@ -452,7 +401,7 @@
             margin-bottom: 20px;
         }
         
-        /* 新增：文章区域（便利贴） */
+        /* 文章区域（便利贴） */
         .articles-section {
             background: rgba(26, 31, 46, 0.85);
             border-radius: 15px;
@@ -470,7 +419,7 @@
         }
         
         .sticky-note {
-            background: #fff9e6;  /* 便利贴底色 */
+            background: #fff9e6;
             background-image: linear-gradient(145deg, #fff9e6 0%, #fef3c7 100%);
             border-radius: 12px 12px 12px 0;
             padding: 25px 15px;
@@ -484,7 +433,6 @@
             text-decoration: none;
             display: block;
             border: 1px solid rgba(255,255,200,0.5);
-            /* 模拟折角 */
             clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
         }
         
@@ -718,13 +666,10 @@
             .profile-info h2 { font-size: 1.8rem; }
             .contact-btn { min-width: 100%; }
             .home-quote { font-size: 1.2rem; padding: 20px; }
-            .weather-card { top: 10px; right: 10px; font-size: 0.9rem; }
-            .weather-icon { font-size: 1.5rem; }
-            .weather-temp { font-size: 1.2rem; }
             
             /* 文章区域小屏适配 */
             .sticky-notes-grid {
-                grid-template-columns: 1fr;  /* 小屏幕每行一个 */
+                grid-template-columns: 1fr;
             }
         }
         
@@ -734,7 +679,6 @@
             .circular-action-btn { width: 100px; height: 100px; font-size: 1rem; }
             .security-tips-list { grid-template-columns: 1fr; }
             .music-player-btn { width: 55px; height: 55px; font-size: 1.5rem; bottom: 20px; right: 20px; }
-            .weather-card { display: none; }
         }
     </style>
 </head>
@@ -743,15 +687,6 @@
         <div style="display: flex; flex-direction: column; align-items: center;">
             <div class="loading-spinner"></div>
             <div class="loading-text">准备中...</div>
-        </div>
-    </div>
-
-    <!-- 天气卡片（仅主页显示） -->
-    <div class="weather-card hidden" id="weatherCard">
-        <div class="weather-icon" id="weatherIcon"><i class="fas fa-cloud-sun"></i></div>
-        <div class="weather-info">
-            <div class="weather-location" id="weatherLocation">北京市朝阳区</div>
-            <div class="weather-temp" id="weatherTemp">12°C</div>
         </div>
     </div>
 
@@ -806,12 +741,12 @@
             
             <div class="profile-section" id="profileSection"></div>
             
-            <!-- 新增：文章区域（便利贴） -->
+            <!-- 文章区域（便利贴） -->
             <div class="articles-section">
                 <h2 class="section-title">文章</h2>
                 <div class="sticky-notes-grid">
-                    <a href="#" class="sticky-note" target="_blank" rel="noopener noreferrer">Hello,this,world</a>
-                    <a href="https://www.csdn.net" class="sticky-note" target="_blank" rel="noopener noreferrer">CSDN</a>
+                    <a href="#" class="sticky-note" target="_blank" rel="noopener noreferrer">Hello,this World</a>
+                    <a href="https://www.kdocs.cn/l/cbonhRM9lX11/" class="sticky-note" target="_blank" rel="noopener noreferrer">我的启示录</a>
                     <a href="#" class="sticky-note" target="_blank" rel="noopener noreferrer">测试</a>
                 </div>
             </div>
@@ -1115,9 +1050,6 @@
             ]
         };
 
-        // 天气API配置
-        const WEATHER_API_KEY = '3dec342311d0bdf45663c064f19650b5';
-
         let currentSettings = {...defaultSettings};
         
         const homePage = document.getElementById('home-page');
@@ -1146,19 +1078,11 @@
         const quoteText = document.getElementById('quoteText');
         const quoteAuthor = document.getElementById('quoteAuthor');
         
-        const weatherCard = document.getElementById('weatherCard');
-        const weatherIcon = document.getElementById('weatherIcon');
-        const weatherLocation = document.getElementById('weatherLocation');
-        const weatherTemp = document.getElementById('weatherTemp');
-        
         function hideLoading() {
             loadingOverlay.style.opacity = '0';
             setTimeout(() => {
                 loadingOverlay.style.display = 'none';
                 homePage.style.display = 'block';
-                if (!weatherCard.classList.contains('hidden')) {
-                    weatherCard.style.opacity = '1';
-                }
             }, 500);
         }
         
@@ -1197,19 +1121,12 @@
                     
                     window.userTimezone = timezone;
                     
-                    if (WEATHER_API_KEY && data.latitude && data.longitude) {
-                        fetchWeather(data.latitude, data.longitude, data.city, data.region);
-                    } else {
-                        weatherCard.classList.add('hidden');
-                    }
-                    
                     hideLoading();
                 })
                 .catch(error => {
                     console.error('IP定位失败，使用系统时间', error);
                     const localHour = new Date().getHours();
                     setRandomBackgroundByHour(localHour);
-                    weatherCard.classList.add('hidden');
                     hideLoading();
                 });
         }
@@ -1248,47 +1165,6 @@
                 const localHour = new Date().getHours();
                 setRandomBackgroundByHour(localHour);
             }
-        }
-        
-        function fetchWeather(lat, lon, city, region) {
-            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=zh_cn`;
-            
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.cod === 200) {
-                        const temp = Math.round(data.main.temp);
-                        const iconCode = data.weather[0].icon;
-                        
-                        let locationStr = city;
-                        if (region && region !== city) {
-                            locationStr = `${region} ${city}`;
-                        }
-                        weatherLocation.textContent = locationStr;
-                        weatherTemp.textContent = `${temp}°C`;
-                        
-                        const iconMap = {
-                            '01d': 'fa-sun', '01n': 'fa-moon',
-                            '02d': 'fa-cloud-sun', '02n': 'fa-cloud-moon',
-                            '03d': 'fa-cloud', '03n': 'fa-cloud',
-                            '04d': 'fa-cloud', '04n': 'fa-cloud',
-                            '09d': 'fa-cloud-rain', '09n': 'fa-cloud-rain',
-                            '10d': 'fa-cloud-sun-rain', '10n': 'fa-cloud-moon-rain',
-                            '11d': 'fa-cloud-bolt', '11n': 'fa-cloud-bolt',
-                            '13d': 'fa-snowflake', '13n': 'fa-snowflake',
-                            '50d': 'fa-smog', '50n': 'fa-smog'
-                        };
-                        const iconClass = iconMap[iconCode] || 'fa-cloud-sun';
-                        weatherIcon.innerHTML = `<i class="fas ${iconClass}"></i>`;
-                        
-                        weatherCard.classList.remove('hidden');
-                    } else {
-                        weatherCard.classList.add('hidden');
-                    }
-                })
-                .catch(() => {
-                    weatherCard.classList.add('hidden');
-                });
         }
         
         function setupRightClickProtection() {
@@ -1561,16 +1437,12 @@
         exploreBtn.addEventListener('click', function() {
             homePage.style.display = 'none';
             explorePage.style.display = 'block';
-            weatherCard.classList.add('hidden');
         });
         
         backToHome.addEventListener('click', function(e) {
             e.preventDefault();
             explorePage.style.display = 'none';
             homePage.style.display = 'block';
-            if (!weatherCard.classList.contains('hidden')) {
-                weatherCard.style.opacity = '1';
-            }
         });
         
         document.addEventListener('DOMContentLoaded', init);
