@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>阳光森林 - 网络安全空间</title>
+    <link rel="icon" href="photo1.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -26,7 +27,7 @@
             cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDZWMjZNMjYgMTZINiIgc3Ryb2tlPSIjMzQ5OEQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjMiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTggOEwyNCAyNE0yNCA4TDggMjQiIHN0cm9rZT0iIzM0OThEIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4='), auto;
         }
         
-        a, button, .contact-btn, .circular-action-btn, .friend-link-item, .music-player-btn {
+        a, button, .contact-btn, .circular-action-btn, .friend-link-item, .music-player-btn, .sticky-note {
             cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggOEwyNCAyNE0yNCA4TDggMjQiIHN0cm9rZT0iI2YxYzQwZiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iNCIgZmlsbD0iI2YxYzQwZiIvPgo8L3N2Zz4='), pointer;
         }
         
@@ -80,28 +81,46 @@
             font-weight: bold;
         }
         
-        .bg-morning-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
         }
         
-        .bg-noon-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1464278533981-50106e6176b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(52, 152, 219, 0.2);
+            border-top: 8px solid var(--blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
         }
         
-        .bg-afternoon-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        .bg-evening-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
-        }
-        
-        .bg-night-mountain {
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') !important;
+        .loading-text {
+            margin-top: 20px;
+            color: var(--blue);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-align: center;
         }
         
         #home-page {
-            display: block;
+            display: none;
             min-height: 100vh;
             text-align: center;
             padding: 40px 20px;
@@ -145,6 +164,7 @@
             display: inline-block;
             font-weight: 300;
             letter-spacing: 2px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         
         .home-subtitle:after {
@@ -168,6 +188,7 @@
             background: rgba(26, 31, 46, 0.7);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(52, 152, 219, 0.2);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         
         .home-buttons {
@@ -244,6 +265,7 @@
             line-height: 1.6;
             color: #f0f0f0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         
         .home-quote-author {
@@ -295,6 +317,7 @@
             font-size: 2.5rem;
             margin-bottom: 15px;
             color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         
         .back-to-home {
@@ -378,6 +401,61 @@
             margin-bottom: 20px;
         }
         
+        /* 文章区域（便利贴） */
+        .articles-section {
+            background: rgba(26, 31, 46, 0.85);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+        
+        .sticky-notes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .sticky-note {
+            background: #fff9e6;
+            background-image: linear-gradient(145deg, #fff9e6 0%, #fef3c7 100%);
+            border-radius: 12px 12px 12px 0;
+            padding: 25px 15px;
+            text-align: center;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 1.3rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 6px 6px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            text-decoration: none;
+            display: block;
+            border: 1px solid rgba(255,255,200,0.5);
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+        }
+        
+        .sticky-note::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 15px;
+            height: 15px;
+            background: linear-gradient(45deg, #d4c39e 0%, #b8a577 100%);
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+        
+        .sticky-note:hover {
+            transform: translateY(-8px) rotate(0.5deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4), 0 10px 10px rgba(0,0,0,0.2);
+        }
+        
+        .sticky-note:active {
+            transform: translateY(-2px);
+        }
+        
         .security-tips-section {
             background: rgba(26, 31, 46, 0.85);
             border-radius: 15px;
@@ -393,6 +471,7 @@
             color: #fff;
             position: relative;
             display: inline-block;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         
         .section-title:after {
@@ -587,6 +666,11 @@
             .profile-info h2 { font-size: 1.8rem; }
             .contact-btn { min-width: 100%; }
             .home-quote { font-size: 1.2rem; padding: 20px; }
+            
+            /* 文章区域小屏适配 */
+            .sticky-notes-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 480px) {
@@ -598,7 +682,14 @@
         }
     </style>
 </head>
-<body class="bg-morning-mountain">
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">准备中...</div>
+        </div>
+    </div>
+
     <div class="right-click-warning" id="rightClickWarning">
         <i class="fas fa-ban"></i>
         <p>本站禁止使用右键</p>
@@ -633,7 +724,7 @@
             
             <div class="home-footer">
                 <div class="home-footer-content">
-                    <div class="home-footer-copyright" id="homeCopyright">阳光森林 © 2026 版权所有</div>
+                    <div class="home-footer-copyright" id="homeCopyright">阳光森林 © 2026 版权所有  V1.8</div>
                 </div>
             </div>
         </div>
@@ -650,6 +741,16 @@
             
             <div class="profile-section" id="profileSection"></div>
             
+            <!-- 文章区域（便利贴） -->
+            <div class="articles-section">
+                <h2 class="section-title">文章</h2>
+                <div class="sticky-notes-grid">
+                    <a href="https://mp.weixin.qq.com/s/6j_7M7HDbVQGK2b3ZAPRYw" class="sticky-note" target="_blank" rel="noopener noreferrer">Hello,this World</a>
+                    <a href="https://www.kdocs.cn/l/cbonhRM9lX11/" class="sticky-note" target="_blank" rel="noopener noreferrer">我的启示录</a>
+                    <a href="#" class="sticky-note" target="_blank" rel="noopener noreferrer">测试</a>
+                </div>
+            </div>
+            
             <div class="security-tips-section" id="securityTipsSection">
                 <h2 class="section-title" id="securityTipsTitlePage">网络安全小贴士</h2>
                 <div class="security-tips-list" id="securityTipsListContainer"></div>
@@ -665,7 +766,7 @@
             </div>
             
             <div class="explore-footer">
-                <p id="exploreCopyright">阳光森林 © 2026 版权所有</p>
+                <p id="exploreCopyright">阳光森林 © 2026 版权所有  V1.8</p>
             </div>
         </div>
     </div>
@@ -675,15 +776,15 @@
             profile: {
                 name: "阳光森林",
                 tagline: "网络安全空间",
-                avatar: "",
+                avatar: "photo2.jpg",
                 description: "10后 · 网络安全爱好者\n探索数字世界的边界，守护网络空间的安全。\n专注于渗透测试、漏洞研究、安全防御与加密技术。\n在虚拟与现实之间，寻找技术的诗意。",
                 additionalFields: []
             },
             contacts: [
                 { 
                     name: "邮箱", 
-                    value: "sunnyforest@example.com",
-                    url: "mailto:sunnyforest@example.com", 
+                    value: "kali0914@yeah.net",
+                    url: "mailto:kali0914@yeah.net", 
                     icon: "fas fa-envelope"
                 },
                 { 
@@ -691,6 +792,12 @@
                     value: "SunnyForest_sec",
                     url: "#", 
                     icon: "fab fa-weixin"
+                },
+                { 
+                    name: "GitHub", 
+                    value: "点击进入我的GitHub",
+                    url: "https://github.com/kali0914", 
+                    icon: "fab fa-github"
                 }
             ],
             securityTips: [
@@ -709,12 +816,12 @@
                 description: "欢迎来到阳光森林的网络安全空间。我是一位10后网络安全爱好者，专注于渗透测试、漏洞研究、安全防御与加密技术。在这里，我将分享网络安全知识、技术实践和行业洞察，与您一同探索数字世界的边界。"
             },
             system: {
-                copyright: "阳光森林 © 2026 版权所有",
+                copyright: "阳光森林 © 2026 版权所有  V1.8",
                 rightClickMessage: "本站禁止使用右键"
             }
         };
 
-        // 200句真实人物名言（真人姓名）
+        // 200句真实人物名言（完整版）
         const quoteLibrary = [
             { text: "学而时习之，不亦说乎。", author: "孔子" },
             { text: "三人行，必有我师焉。择其善者而从之，其不善者而改之。", author: "孔子" },
@@ -914,6 +1021,35 @@
             { text: "道之将行也与，命也；道之将废也与，命也。", author: "孔子" }
         ];
 
+        // 随机背景图库（山峰主题）
+        const backgroundImages = {
+            morning: [
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            noon: [
+                'https://images.unsplash.com/photo-1464278533981-50106e6176b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            afternoon: [
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1505765050516-f72dcac9c60e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            evening: [
+                'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ],
+            night: [
+                'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1507400492013-162706c8c05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+                'https://images.unsplash.com/photo-1472745433479-4556f22e32c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+            ]
+        };
+
         let currentSettings = {...defaultSettings};
         
         const homePage = document.getElementById('home-page');
@@ -921,6 +1057,7 @@
         const exploreBtn = document.getElementById('exploreBtn');
         const backToHome = document.getElementById('backToHome');
         const rightClickWarning = document.getElementById('rightClickWarning');
+        const loadingOverlay = document.getElementById('loadingOverlay');
         
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicPlayerBtn');
@@ -941,6 +1078,14 @@
         const quoteText = document.getElementById('quoteText');
         const quoteAuthor = document.getElementById('quoteAuthor');
         
+        function hideLoading() {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+                homePage.style.display = 'block';
+            }, 500);
+        }
+        
         function init() {
             initBackgroundAndLocation();
             pickRandomQuote();
@@ -948,6 +1093,12 @@
             updateAllPages();
             initMusicPlayer();
             setInterval(updateBackgroundByLocalTime, 3600000);
+            
+            setTimeout(() => {
+                if (loadingOverlay.style.display !== 'none') {
+                    hideLoading();
+                }
+            }, 5000);
         }
         
         function pickRandomQuote() {
@@ -965,31 +1116,43 @@
                     const now = new Date();
                     const localTimeStr = now.toLocaleString('zh-CN', { timeZone: timezone, hour12: false });
                     const localHour = new Date(localTimeStr).getHours();
-                    updateBackgroundByHour(localHour);
+                    
+                    setRandomBackgroundByHour(localHour);
+                    
                     window.userTimezone = timezone;
+                    
+                    hideLoading();
                 })
                 .catch(error => {
                     console.error('IP定位失败，使用系统时间', error);
                     const localHour = new Date().getHours();
-                    updateBackgroundByHour(localHour);
+                    setRandomBackgroundByHour(localHour);
+                    hideLoading();
                 });
         }
         
-        function updateBackgroundByHour(hour) {
-            let bgClass = '';
+        function setRandomBackgroundByHour(hour) {
+            let period;
             if (hour >= 5 && hour < 9) {
-                bgClass = 'bg-morning-mountain';
+                period = 'morning';
             } else if (hour >= 9 && hour < 12) {
-                bgClass = 'bg-noon-mountain';
+                period = 'noon';
             } else if (hour >= 12 && hour < 17) {
-                bgClass = 'bg-afternoon-mountain';
+                period = 'afternoon';
             } else if (hour >= 17 && hour < 20) {
-                bgClass = 'bg-evening-mountain';
+                period = 'evening';
             } else {
-                bgClass = 'bg-night-mountain';
+                period = 'night';
             }
-            document.body.className = '';
-            document.body.classList.add(bgClass);
+            
+            const images = backgroundImages[period];
+            const randomIndex = Math.floor(Math.random() * images.length);
+            const selectedImage = images[randomIndex];
+            
+            document.body.style.backgroundImage = `linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('${selectedImage}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundAttachment = 'fixed';
         }
         
         function updateBackgroundByLocalTime() {
@@ -997,10 +1160,10 @@
                 const now = new Date();
                 const localTimeStr = now.toLocaleString('zh-CN', { timeZone: window.userTimezone, hour12: false });
                 const localHour = new Date(localTimeStr).getHours();
-                updateBackgroundByHour(localHour);
+                setRandomBackgroundByHour(localHour);
             } else {
                 const localHour = new Date().getHours();
-                updateBackgroundByHour(localHour);
+                setRandomBackgroundByHour(localHour);
             }
         }
         
