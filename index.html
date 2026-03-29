@@ -45,6 +45,7 @@
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
+            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('photo3.jpg');
         }
         
         .right-click-warning {
@@ -1021,35 +1022,6 @@
             { text: "道之将行也与，命也；道之将废也与，命也。", author: "孔子" }
         ];
 
-        // 随机背景图库（山峰主题）
-        const backgroundImages = {
-            morning: [
-                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
-            ],
-            noon: [
-                'https://images.unsplash.com/photo-1464278533981-50106e6176b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
-            ],
-            afternoon: [
-                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1505765050516-f72dcac9c60e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
-            ],
-            evening: [
-                'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
-            ],
-            night: [
-                'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1507400492013-162706c8c05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-                'https://images.unsplash.com/photo-1472745433479-4556f22e32c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
-            ]
-        };
-
         let currentSettings = {...defaultSettings};
         
         const homePage = document.getElementById('home-page');
@@ -1087,18 +1059,12 @@
         }
         
         function init() {
-            initBackgroundAndLocation();
+            // 取消IP定位，直接显示主页
             pickRandomQuote();
             setupRightClickProtection();
             updateAllPages();
             initMusicPlayer();
-            setInterval(updateBackgroundByLocalTime, 3600000);
-            
-            setTimeout(() => {
-                if (loadingOverlay.style.display !== 'none') {
-                    hideLoading();
-                }
-            }, 5000);
+            hideLoading();
         }
         
         function pickRandomQuote() {
@@ -1106,65 +1072,6 @@
             const selected = quoteLibrary[randomIndex];
             quoteText.textContent = selected.text;
             quoteAuthor.textContent = '—— ' + selected.author;
-        }
-        
-        function initBackgroundAndLocation() {
-            fetch('https://ipapi.co/json/')
-                .then(response => response.json())
-                .then(data => {
-                    const timezone = data.timezone || 'Asia/Shanghai';
-                    const now = new Date();
-                    const localTimeStr = now.toLocaleString('zh-CN', { timeZone: timezone, hour12: false });
-                    const localHour = new Date(localTimeStr).getHours();
-                    
-                    setRandomBackgroundByHour(localHour);
-                    
-                    window.userTimezone = timezone;
-                    
-                    hideLoading();
-                })
-                .catch(error => {
-                    console.error('IP定位失败，使用系统时间', error);
-                    const localHour = new Date().getHours();
-                    setRandomBackgroundByHour(localHour);
-                    hideLoading();
-                });
-        }
-        
-        function setRandomBackgroundByHour(hour) {
-            let period;
-            if (hour >= 5 && hour < 9) {
-                period = 'morning';
-            } else if (hour >= 9 && hour < 12) {
-                period = 'noon';
-            } else if (hour >= 12 && hour < 17) {
-                period = 'afternoon';
-            } else if (hour >= 17 && hour < 20) {
-                period = 'evening';
-            } else {
-                period = 'night';
-            }
-            
-            const images = backgroundImages[period];
-            const randomIndex = Math.floor(Math.random() * images.length);
-            const selectedImage = images[randomIndex];
-            
-            document.body.style.backgroundImage = `linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('${selectedImage}')`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center';
-            document.body.style.backgroundAttachment = 'fixed';
-        }
-        
-        function updateBackgroundByLocalTime() {
-            if (window.userTimezone) {
-                const now = new Date();
-                const localTimeStr = now.toLocaleString('zh-CN', { timeZone: window.userTimezone, hour12: false });
-                const localHour = new Date(localTimeStr).getHours();
-                setRandomBackgroundByHour(localHour);
-            } else {
-                const localHour = new Date().getHours();
-                setRandomBackgroundByHour(localHour);
-            }
         }
         
         function setupRightClickProtection() {
