@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>阳光森林 - 网络安全空间</title>
     <link rel="icon" href="photo1.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -161,7 +161,7 @@
             justify-content: center;
             gap: 15px;
             margin-bottom: 30px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* 强制一排 */
         }
         
         .pin-digit {
@@ -176,11 +176,20 @@
             color: white;
             outline: none;
             transition: 0.2s;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
         }
         
         .pin-digit:focus {
             border-color: #3498db;
             box-shadow: 0 0 10px rgba(52,152,219,0.5);
+        }
+        
+        /* 隐藏数字输入框的上下箭头 */
+        .pin-digit::-webkit-outer-spin-button,
+        .pin-digit::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
         
         .pin-error {
@@ -387,7 +396,7 @@
             color: white;
         }
         
-        /* 探索页面样式（略，与原版一致） */
+        /* 探索页面样式 */
         #explore-page {
             display: none;
             min-height: 100vh;
@@ -697,6 +706,7 @@
             .circular-action-btn { width: 120px; height: 120px; font-size: 1.2rem; }
             .sticky-notes-grid { grid-template-columns: 1fr; }
             .pin-digit { width: 45px; height: 55px; font-size: 1.5rem; }
+            .pin-inputs { gap: 8px; }
         }
     </style>
 </head>
@@ -715,12 +725,12 @@
             <h3><i class="fas fa-lock"></i> 管理员通道</h3>
             <p>请输入6位数字密码</p>
             <div class="pin-inputs" id="pinInputs">
-                <input type="text" maxlength="1" class="pin-digit" id="pin0" autocomplete="off">
-                <input type="text" maxlength="1" class="pin-digit" id="pin1" autocomplete="off">
-                <input type="text" maxlength="1" class="pin-digit" id="pin2" autocomplete="off">
-                <input type="text" maxlength="1" class="pin-digit" id="pin3" autocomplete="off">
-                <input type="text" maxlength="1" class="pin-digit" id="pin4" autocomplete="off">
-                <input type="text" maxlength="1" class="pin-digit" id="pin5" autocomplete="off">
+                <input type="text" maxlength="1" class="pin-digit" id="pin0" autocomplete="off" inputmode="numeric" pattern="\d*">
+                <input type="text" maxlength="1" class="pin-digit" id="pin1" autocomplete="off" inputmode="numeric" pattern="\d*">
+                <input type="text" maxlength="1" class="pin-digit" id="pin2" autocomplete="off" inputmode="numeric" pattern="\d*">
+                <input type="text" maxlength="1" class="pin-digit" id="pin3" autocomplete="off" inputmode="numeric" pattern="\d*">
+                <input type="text" maxlength="1" class="pin-digit" id="pin4" autocomplete="off" inputmode="numeric" pattern="\d*">
+                <input type="text" maxlength="1" class="pin-digit" id="pin5" autocomplete="off" inputmode="numeric" pattern="\d*">
             </div>
             <div class="pin-error" id="pinError"></div>
             <button class="pin-btn" id="pinSubmit">验证登录</button>
@@ -1071,10 +1081,8 @@
         }
         
         function updateAllPages() {
-            // 更新主页脚版本
             if (homeCopyright) homeCopyright.textContent = currentSettings.system.copyright;
             if (exploreCopyright) exploreCopyright.textContent = currentSettings.system.copyright;
-            // 更新探索页面内容
             updateProfileSection();
             updateSecurityTipsSection();
             updateContactSection();
@@ -1127,7 +1135,6 @@
                     </div>
                 </a>
             `).join('');
-            // 为无效链接添加提示
             document.querySelectorAll('.contact-btn[href="javascript:void(0)"]').forEach(btn => {
                 btn.addEventListener('click', (e) => { e.preventDefault(); alert('链接尚未配置'); });
             });
@@ -1171,9 +1178,8 @@
             setTimeout(() => rightClickWarning.style.display = 'none', 3000);
         }
         
-        // 密码验证逻辑
+        // 密码验证逻辑（强化：只允许纯数字输入）
         function initPinModal() {
-            // 自动聚焦第一个
             const openModal = () => {
                 pinModal.classList.add('active');
                 setTimeout(() => pinInputs[0].focus(), 100);
@@ -1187,18 +1193,29 @@
             closePin.addEventListener('click', () => pinModal.classList.remove('active'));
             pinModal.addEventListener('click', (e) => { if (e.target === pinModal) pinModal.classList.remove('active'); });
             
-            // 输入框联动
+            // 为每个输入框添加输入过滤（只允许数字）
             pinInputs.forEach((input, idx) => {
                 input.addEventListener('input', (e) => {
-                    const val = e.target.value;
-                    if (val && /^\d$/.test(val)) {
-                        if (idx < 5) pinInputs[idx+1].focus();
-                    } else if (val.length > 1) e.target.value = val.charAt(0);
+                    let val = e.target.value;
+                    // 过滤非数字字符
+                    val = val.replace(/\D/g, '');
+                    if (val.length > 1) val = val.charAt(0);
+                    e.target.value = val;
+                    if (val && idx < 5) {
+                        pinInputs[idx+1].focus();
+                    }
                 });
                 input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Backspace' && !input.value && idx > 0) pinInputs[idx-1].focus();
+                    if (e.key === 'Backspace' && !input.value && idx > 0) {
+                        pinInputs[idx-1].focus();
+                    }
                 });
-                input.addEventListener('keypress', (e) => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
+                // 阻止非数字按键（但保留控制键）
+                input.addEventListener('keypress', (e) => {
+                    if (!/^\d$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
             });
             
             pinSubmit.addEventListener('click', () => {
