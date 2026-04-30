@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CometChat 测试页面</title>
+    <title>CometChat 匿名聊天测试</title>
     <style>
         body {
             background-color: #0a0e17;
@@ -16,33 +16,36 @@
             margin: 0;
             flex-direction: column;
         }
-        h2 {
-            margin-bottom: 20px;
-        }
+        h2 { margin-bottom: 20px; }
+        p { color: #aaa; }
     </style>
 </head>
 <body>
-    <h2>CometChat 小组件测试</h2>
-    <p>如果右下角出现聊天图标，说明接入成功</p>
+    <h2>CometChat 测试页面</h2>
+    <p>如果右下角出现聊天图标，说明匿名聊天接入成功</p>
 
-    <!-- CometChat Widget -->
+    <!-- 1. 加载 CometChat Widget 核心库 -->
     <script src="https://widget-js.cometchat.io/v3/cometchatwidget.js"></script>
+
+    <!-- 2. 初始化 Widget（游客模式） -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             CometChatWidget.init({
                 "appID": "167836595192bea6c",
                 "appRegion": "us",
                 "authKey": "f5880b7bcc807aeca4074bd2ac1249da9b2bd310",
-                "guestMode": true,
+                "mode": "guest",                          // ← 关键：启用游客模式，无需登录
                 "widgetSettings": {
-                    "type": "docked",
-                    "dockedPosition": "right"
+                    "type": "docked",                     // 右下角悬浮气泡
+                    "dockedPosition": "right",
+                    "showTitle": true,
+                    "title": "匿名聊天室"
                 }
             }).then(response => {
-                console.log("CometChat Widget 初始化成功");
+                console.log("✅ CometChat 初始化成功", response);
             }).catch(error => {
-                console.error("CometChat Widget 初始化失败", error);
-                document.body.innerHTML += '<p style="color:red;">初始化失败，请检查控制台</p>';
+                console.error("❌ CometChat 初始化失败", error);
+                document.body.innerHTML += '<p style="color:red;">初始化失败，请按F12查看Console错误</p>';
             });
         });
     </script>
