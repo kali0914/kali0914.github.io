@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>404 - 页面未找到 | 阳光森林</title>
+    <link rel="icon" href="photo1.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --blue: #3498db;
+            --red: #e74c3c;
+            --pink: #e84393;
+            --yellow: #f1c40f;
+            --orange: #e67e22;
+            --green: #2ecc71;
+            --purple: #9b59b6;
+            --dark-bg: #0a0e17;
+            --light-bg: #1a1f2e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-image: linear-gradient(rgba(10, 14, 23, 0.7), rgba(10, 14, 23, 0.7)), url('photo3.jpg');
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error-container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(26, 31, 46, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            padding: 50px 30px;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transition: transform 0.3s;
+        }
+        
+        .error-container:hover {
+            transform: translateY(-5px);
+            border-color: rgba(52, 152, 219, 0.6);
+        }
+        
+        .error-icon {
+            font-size: 6rem;
+            color: var(--blue);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(52,152,219,0.5);
+        }
+        
+        .error-code {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--blue), var(--pink), var(--yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: 5px;
+        }
+        
+        .error-message {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: #eee;
+        }
+        
+        .error-description {
+            color: #aaa;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            color: white;
+            text-decoration: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .home-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52,152,219,0.4);
+        }
+        
+        .footer-note {
+            margin-top: 35px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        @media (max-width: 480px) {
+            .error-code { font-size: 3rem; }
+            .error-message { font-size: 1.3rem; }
+            .error-container { padding: 35px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-compass"></i>
+        </div>
+        <div class="error-code">404</div>
+        <div class="error-message">哎呀！页面走丢了</div>
+        <div class="error-description">
+            您访问的页面不存在或已被移除。<br>
+            请检查网址是否正确，或返回首页。
+        </div>
+        <a href="index.html" class="home-link">
+            <i class="fas fa-home"></i> 返回首页
+        </a>
+        <div class="footer-note">
+            <i class="fas fa-shield-alt"></i> 阳光森林 · 网络安全空间
+        </div>
+    </div>
+</body>
+</html>
