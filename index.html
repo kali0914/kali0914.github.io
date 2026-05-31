@@ -22,6 +22,48 @@
         a, button, .circular-action-btn, .friend-link-item, .music-player-btn, .sticky-note, .admin-link {
             cursor: pointer;
         }
+        .fullscreen-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(10px);
+            z-index: 99999; display: flex; justify-content: center; align-items: center;
+            flex-direction: column; text-align: center; padding: 20px;
+        }
+        .geo-block {
+            background: rgba(26,31,46,0.9); border-radius: 30px; padding: 50px 40px;
+            max-width: 600px; width: 90%; border: 1px solid rgba(231,76,60,0.4);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: fadeInUp 0.8s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .geo-icon { font-size: 5rem; color: var(--red); margin-bottom: 25px; }
+        .geo-title { font-size: 2.5rem; margin-bottom: 15px; letter-spacing: 2px; }
+        .geo-sub { font-size: 1.2rem; color: #ccc; margin-bottom: 20px; line-height: 1.6; }
+        .geo-eng { font-size: 1.1rem; color: #aaa; margin-bottom: 30px; line-height: 1.6; font-style: italic; }
+        .geo-ip { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 12px 20px; margin: 20px 0;
+                  font-size: 0.9rem; color: #999; border: 1px solid rgba(255,255,255,0.1); }
+        .geo-ip span { color: var(--blue); font-weight: bold; }
+        .geo-contact { margin-top: 30px; font-size: 0.9rem; color: #888; }
+        .geo-contact a { color: var(--blue); text-decoration: none; }
+        .geo-contact a:hover { text-decoration: underline; }
+        .privacy-modal {
+            background: rgba(26,31,46,0.95); border-radius: 30px; padding: 40px;
+            max-width: 700px; width: 90%; border: 1px solid rgba(52,152,219,0.4);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); max-height: 80vh; overflow-y: auto;
+        }
+        .privacy-title { font-size: 2rem; margin-bottom: 20px; }
+        .privacy-text { text-align: left; color: #ccc; line-height: 1.8; margin-bottom: 30px; font-size: 0.95rem; }
+        .privacy-text h3 { color: var(--blue); margin: 15px 0 10px; }
+        .privacy-text p { margin-bottom: 10px; }
+        .privacy-btn {
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            border: none; padding: 14px 40px; font-size: 1.2rem; font-weight: bold;
+            color: white; border-radius: 50px; cursor: pointer; transition: 0.3s;
+            margin: 10px;
+        }
+        .privacy-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(52,152,219,0.3); }
+        .privacy-decline { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
         .right-click-warning { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(231,76,60,0.95); color: white; padding: 20px 30px; border-radius: 10px; z-index: 9999; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid white; animation: warningPulse 0.5s; }
         @keyframes warningPulse { 0% { transform: translate(-50%,-50%) scale(0.8); opacity: 0; } 70% { transform: translate(-50%,-50%) scale(1.05); } 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; } }
         .right-click-warning i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
@@ -111,12 +153,61 @@
     </style>
 </head>
 <body>
+    <!-- 地域限制 -->
+    <div id="geo-block" class="fullscreen-overlay" style="display: none;">
+        <div class="geo-block">
+            <div class="geo-icon"><i class="fas fa-shield-alt"></i></div>
+            <h1 class="geo-title">访问被拒绝</h1>
+            <p class="geo-sub">抱歉，您所在的地区暂时无法访问此网站。</p>
+            <p class="geo-eng">Sorry, this website is not accessible from your current region.</p>
+            <div class="geo-ip">
+                <i class="fas fa-globe"></i> 您的IP属地 / Your IP：<span id="ip-country">检测中...</span>
+            </div>
+            <div class="geo-contact">
+                如果您是合法访客，请通过以下方式联系管理员：<br>
+                If you are a legitimate visitor, please contact the admin via:<br>
+                <a href="mailto:kali0914@yeah.net"><i class="fas fa-envelope"></i> kali0914@yeah.net</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隐私政策 -->
+    <div id="privacy-modal" class="fullscreen-overlay" style="display: none;">
+        <div class="privacy-modal">
+            <h2 class="privacy-title"><i class="fas fa-shield-alt"></i> 隐私政策</h2>
+            <div class="privacy-text">
+                <h3>一、我们收集的信息</h3>
+                <p>本站为静态个人博客，原则上不主动收集个人信息。在您访问时，可能自动记录IP地址、浏览器类型等非个人身份信息，仅用于安全分析和访问统计。</p>
+                <h3>二、Cookie 和类似技术</h3>
+                <p>本站使用Cookie或本地存储技术来改善您的浏览体验。例如，记录您对隐私政策的同意状态，避免重复提示。您可通过浏览器设置管理或删除Cookie。</p>
+                <h3>三、信息的使用</h3>
+                <p>我们收集的信息仅用于确保网站正常运行、分析访问数据和回复您的咨询。我们不会出售、出租或与第三方商业分享您的信息。</p>
+                <h3>四、数据存储与安全</h3>
+                <p>我们采取合理技术措施保护您的信息安全。本站托管于GitHub Pages，数据存储受其安全政策保护。</p>
+                <h3>五、儿童隐私</h3>
+                <p>本网站不面向13岁以下儿童，我们不会故意收集儿童的个人信息。</p>
+                <h3>六、外部链接</h3>
+                <p>本站可能包含外部链接，我们对这些网站的隐私措施不承担责任。</p>
+                <h3>七、联系我们</h3>
+                <p>如有疑问，请联系：kali0914@yeah.net</p>
+                <p style="margin-top: 20px; font-size: 0.85rem; color: #888;">最后更新：2026年5月31日</p>
+            </div>
+            <button class="privacy-btn" id="accept-privacy">同意并继续</button>
+        </div>
+    </div>
+
+    <!-- 加载动画（双语） -->
     <div class="loading-overlay" id="loadingOverlay">
         <div style="display:flex; flex-direction:column; align-items:center;">
             <div class="loading-spinner"></div>
-            <div class="loading-text">准备中...</div>
+            <div class="loading-text">
+                正在验证访问权限...<br>
+                Checking access permission...
+            </div>
         </div>
     </div>
+
+    <!-- 管理员登录 -->
     <div class="pin-modal" id="pinModal">
         <div class="pin-card">
             <h3><i class="fas fa-lock"></i> 管理员通道</h3>
@@ -134,6 +225,7 @@
             <button class="close-pin" id="closePinModal"><i class="fas fa-times"></i> 取消</button>
         </div>
     </div>
+
     <div class="right-click-warning" id="rightClickWarning"><i class="fas fa-ban"></i><p>本站禁止使用右键</p></div>
     <audio id="bgMusic" src="music.MP3" preload="auto" loop></audio>
     <div class="music-player-btn" id="musicPlayerBtn" title="播放/暂停音乐"><i class="fas fa-music"></i></div>
@@ -166,7 +258,6 @@
                     <a href="#" class="sticky-note" target="_blank">测试</a>
                 </div>
             </div>
-            <!-- AI 助手 -->
             <div class="ai-section">
                 <h2 class="section-title"><i class="fas fa-robot"></i> AI 助手 (DeepSeek)</h2>
                 <div class="ai-chat-box">
@@ -188,14 +279,13 @@
     </div>
 
     <script>
-        // ==================== 密钥分段存储 ====================
+        // 密钥分段
         function getApiKey() {
             const part1 = "sk-6a9409ced29f46ee";
             const part2 = "af5ecb12d0d04e71";
             return part1 + part2;
         }
 
-        // ==================== 200句名人名言 ====================
         const quoteLibrary = [
             { text: "学而时习之，不亦说乎。", author: "孔子" },
             { text: "三人行，必有我师焉。择其善者而从之，其不善者而改之。", author: "孔子" },
@@ -415,21 +505,75 @@
         const sendBtn = document.getElementById('sendBtn');
         const clearChatBtn = document.getElementById('clearChatBtn');
 
-        function init() {
+        const geoBlock = document.getElementById('geo-block');
+        const privacyModal = document.getElementById('privacy-modal');
+        const acceptPrivacyBtn = document.getElementById('accept-privacy');
+
+        // IP检测（竞速）
+        async function checkGeoAccess() {
+            const fetchCountryIs = fetch('https://api.country.is/')
+                .then(res => res.json())
+                .then(data => data.country)
+                .catch(() => null);
+            const fetchIpapi = fetch('https://ipapi.co/json/')
+                .then(res => res.json())
+                .then(data => data.country_code)
+                .catch(() => null);
+            const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
+
+            const country = await Promise.race([fetchCountryIs, fetchIpapi, timeout]);
+
+            if (!country) {
+                document.getElementById('ip-country').textContent = '检测失败';
+                geoBlock.style.display = 'flex';
+                loadingOverlay.style.display = 'none';
+                return false;
+            }
+
+            document.getElementById('ip-country').textContent = country;
+            if (country !== 'CN') {
+                geoBlock.style.display = 'flex';
+                loadingOverlay.style.display = 'none';
+                return false;
+            }
+
+            loadingOverlay.style.display = 'none';
+            return true;
+        }
+
+        function hasAcceptedPrivacy() {
+            return document.cookie.split('; ').find(row => row.startsWith('privacy_accepted='));
+        }
+
+        function setPrivacyCookie() {
+            const expires = new Date();
+            expires.setFullYear(expires.getFullYear() + 1);
+            document.cookie = `privacy_accepted=true; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+        }
+
+        function startSite() {
             pickRandomQuote();
             setupRightClick();
             updateAllPages();
             initMusic();
             initPinModal();
-            hideLoading();
+            homePage.style.display = 'block';
         }
 
-        function hideLoading() {
-            loadingOverlay.style.opacity = '0';
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-                homePage.style.display = 'block';
-            }, 500);
+        async function init() {
+            const accessGranted = await checkGeoAccess();
+            if (!accessGranted) return;
+
+            if (!hasAcceptedPrivacy()) {
+                privacyModal.style.display = 'flex';
+                acceptPrivacyBtn.addEventListener('click', () => {
+                    setPrivacyCookie();
+                    privacyModal.style.display = 'none';
+                    startSite();
+                });
+            } else {
+                startSite();
+            }
         }
 
         function pickRandomQuote() {
@@ -489,7 +633,6 @@
             });
         }
 
-        // ==================== AI 聊天，直接调用 DeepSeek API ====================
         async function sendMessage() {
             const msg = chatInput.value.trim();
             if (!msg) return;
