@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>局域网 - 阳光森林</title>
+    <title>404 - 页面未找到 | 阳光森林</title>
     <link rel="icon" href="photo1.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ========== 全局样式（与 index.html 完全一致） ========== */
         :root {
             --blue: #3498db;
             --red: #e74c3c;
@@ -25,18 +24,9 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDZWMjZNMjYgMTZINiIgc3Ryb2tlPSIjMzQ5OEQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjMiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTggOEwyNCAyNE0yNCA4TDggMjQiIHN0cm9rZT0iIzM0OThEIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4='), auto;
-        }
-        
-        a, button, .back-home-btn {
-            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggOEwyNCAyNE0yNCA4TDggMjQiIHN0cm9rZT0iI2YxYzQwZiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iNCIgZmlsbD0iI2YxYzQwZiIvPgo8L3N2Zz4='), pointer;
         }
         
         body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
             background-color: var(--dark-bg);
             color: #fff;
             min-height: 100vh;
@@ -44,226 +34,112 @@
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('photo3.jpg');
-            overflow-y: scroll;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        body::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .admin-wrapper {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px 80px;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .admin-card {
-            background: rgba(26, 31, 46, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
-            padding: 30px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(52,152,219,0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .admin-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            border-color: rgba(52,152,219,0.5);
-        }
-        
-        .section-title {
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: #fff;
-            position: relative;
-            display: inline-block;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        
-        .section-title:after {
-            content: "";
-            position: absolute;
-            width: 50%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--blue), var(--pink));
-            bottom: -10px;
-            left: 0;
-            border-radius: 2px;
-        }
-        
-        /* 静态内容样式（不可编辑） */
-        .static-content {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 20px;
-            color: #ddd;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        
-        .image-grid {
+            background-image: linear-gradient(rgba(10, 14, 23, 0.7), rgba(10, 14, 23, 0.7)), url('photo3.jpg');
             display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-top: 20px;
+            align-items: center;
             justify-content: center;
-        }
-        
-        .image-item {
-            flex: 1;
-            min-width: 250px;
             text-align: center;
+            padding: 20px;
         }
         
-        .image-item img {
+        .error-container {
+            max-width: 600px;
             width: 100%;
-            max-width: 400px;
-            border-radius: 20px;
-            border: 2px solid rgba(52,152,219,0.4);
-            transition: transform 0.3s, box-shadow 0.3s;
-            background: rgba(0,0,0,0.3);
+            background: rgba(26, 31, 46, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            padding: 50px 30px;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transition: transform 0.3s;
         }
         
-        .image-item img:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            border-color: var(--blue);
+        .error-container:hover {
+            transform: translateY(-5px);
+            border-color: rgba(52, 152, 219, 0.6);
         }
         
-        .image-caption {
-            margin-top: 12px;
-            color: #ccc;
-            font-size: 0.9rem;
+        .error-icon {
+            font-size: 6rem;
+            color: var(--blue);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(52,152,219,0.5);
         }
         
-        .image-placeholder {
-            background: rgba(0,0,0,0.5);
-            border-radius: 20px;
-            padding: 60px 20px;
-            text-align: center;
+        .error-code {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--blue), var(--pink), var(--yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: 5px;
+        }
+        
+        .error-message {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: #eee;
+        }
+        
+        .error-description {
             color: #aaa;
+            margin-bottom: 35px;
+            line-height: 1.6;
             font-size: 1rem;
-            border: 1px dashed rgba(255,255,255,0.2);
         }
         
-        .custom-placeholder {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 40px 20px;
-            text-align: center;
-            color: #888;
-            border: 1px dashed rgba(255,255,255,0.2);
-            font-style: italic;
-        }
-        
-        .back-home-btn {
+        .home-link {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(26,31,46,0.9);
-            border: 1px solid rgba(52,152,219,0.4);
-            border-radius: 40px;
-            padding: 12px 28px;
+            gap: 10px;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
             color: white;
             text-decoration: none;
+            padding: 12px 28px;
+            border-radius: 50px;
             font-weight: bold;
+            font-size: 1.1rem;
             transition: all 0.3s;
-            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
-        .back-home-btn:hover {
-            background: rgba(52,152,219,0.3);
-            border-color: var(--blue);
+        .home-link:hover {
             transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52,152,219,0.4);
         }
         
-        @media (max-width: 768px) {
-            .admin-wrapper {
-                padding: 20px 15px 60px;
-            }
-            .section-title {
-                font-size: 1.6rem;
-            }
-            .image-grid {
-                flex-direction: column;
-                align-items: center;
-            }
+        .footer-note {
+            margin-top: 35px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        @media (max-width: 480px) {
+            .error-code { font-size: 3rem; }
+            .error-message { font-size: 1.3rem; }
+            .error-container { padding: 35px 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="admin-wrapper">
-        <!-- 今日头条区域：静态文本，不可编辑，内容在代码中修改 -->
-        <div class="admin-card">
-            <h2 class="section-title"><i class="fas fa-newspaper" style="margin-right: 10px;"></i> 今日头条</h2>
-            <div class="static-content" id="headlineContent">
-                张轩宇。
-            </div>
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-compass"></i>
         </div>
-        
-        <!-- 图片展示区：如果图片加载失败则显示“暂无” -->
-        <div class="admin-card">
-            <h2 class="section-title"><i class="fas fa-images" style="margin-right: 10px;"></i> 图片展示区</h2>
-            <div class="image-grid">
-                <div class="image-item" id="imgContainer1">
-                    <img id="img1" src="admin1.jpg" style="display: block;">
-                    <div class="image-caption">admin1.jpg</div>
-                </div>
-                <div class="image-item" id="imgContainer2">
-                    <img id="img2" src="admin2.jpg" style="display: block;">
-                    <div class="image-caption">admin2.jpg</div>
-                </div>
-            </div>
+        <div class="error-code">404</div>
+        <div class="error-message">哎呀！页面走丢了</div>
+        <div class="error-description">
+            您访问的页面不存在或已被移除。<br>
+            请检查网址是否正确，或返回首页。
         </div>
-        
-        <!-- 测试区域：静态预留，不可编辑 -->
-        <div class="admin-card">
-            <h2 class="section-title"><i class="fas fa-pen-ruler" style="margin-right: 10px;"></i> 自定义区域</h2>
-            <div class="static-content" id="customContent">
-                测试。
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="https://www.ygsl.us.ci" class="back-home-btn"><i class="fas fa-arrow-left"></i> 返回网站首页</a>
+        <a href="index.html" class="home-link">
+            <i class="fas fa-home"></i> 返回首页
+        </a>
+        <div class="footer-note">
+            <i class="fas fa-shield-alt"></i> 阳光森林 · 网络安全空间
         </div>
     </div>
-    
-    <script>
-        // 处理图片加载失败：隐藏图片并显示“暂无”
-        function handleImageError(imgElement, containerId) {
-            imgElement.onerror = null;
-            imgElement.style.display = 'none';
-            const container = document.getElementById(containerId);
-            const placeholder = document.createElement('div');
-            placeholder.className = 'image-placeholder';
-            placeholder.innerHTML = '<i class="fas fa-image" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>暂无';
-            // 如果已经存在占位符则不再添加
-            if (!container.querySelector('.image-placeholder')) {
-                container.appendChild(placeholder);
-            }
-        }
-        
-        const img1 = document.getElementById('img1');
-        const img2 = document.getElementById('img2');
-        if (img1) {
-            img1.onerror = () => handleImageError(img1, 'imgContainer1');
-        }
-        if (img2) {
-            img2.onerror = () => handleImageError(img2, 'imgContainer2');
-        }
-        
-        // 禁用右键、选择等（与主页一致）
-        document.addEventListener('contextmenu', (e) => e.preventDefault());
-        document.addEventListener('selectstart', (e) => e.preventDefault());
-        document.addEventListener('dragstart', (e) => e.preventDefault());
-    </script>
 </body>
 </html>
