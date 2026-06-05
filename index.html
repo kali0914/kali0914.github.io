@@ -63,7 +63,6 @@
             margin: 10px;
         }
         .privacy-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(52,152,219,0.3); }
-        .privacy-decline { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
         .right-click-warning { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(231,76,60,0.95); color: white; padding: 20px 30px; border-radius: 10px; z-index: 9999; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid white; animation: warningPulse 0.5s; }
         @keyframes warningPulse { 0% { transform: translate(-50%,-50%) scale(0.8); opacity: 0; } 70% { transform: translate(-50%,-50%) scale(1.05); } 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; } }
         .right-click-warning i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
@@ -76,12 +75,48 @@
         .pin-card { background: rgba(26,31,46,0.95); backdrop-filter: blur(15px); border-radius: 30px; padding: 40px; width:90%; max-width:500px; border: 1px solid rgba(52,152,219,0.4); text-align: center; }
         .pin-card h3 { font-size: 1.8rem; margin-bottom: 10px; color: white; }
         .pin-inputs { display: flex; justify-content: center; gap:15px; margin-bottom: 30px; flex-wrap: nowrap; }
-        .pin-digit { width:60px; height:70px; text-align:center; font-size:2rem; font-weight:bold; background:rgba(0,0,0,0.6); border:2px solid rgba(52,152,219,0.5); border-radius:15px; color:white; outline:none; transition:0.2s; }
+        .pin-digit { width:60px; height:70px; text-align:center; font-size:2rem; font-weight:bold; background:rgba(0,0,0,0.6); border:2px solid rgba(52,152,219,0.5); border-radius:15px; color:white; outline:none; transition:0.2s; text-transform: uppercase; }
         .pin-digit:focus { border-color:#3498db; box-shadow:0 0 10px rgba(52,152,219,0.5); }
         .pin-error { color:#e74c3c; margin-bottom:20px; min-height:40px; }
         .pin-btn { background:linear-gradient(45deg,#3498db,#e84393); border:none; padding:12px 30px; font-size:1.2rem; font-weight:bold; color:white; border-radius:50px; cursor:pointer; transition:0.3s; margin-top:10px; }
         .pin-btn:hover { transform:translateY(-3px); box-shadow:0 10px 20px rgba(52,152,219,0.3); }
         .close-pin { margin-top:20px; background:none; border:none; color:#888; cursor:pointer; font-size:0.9rem; }
+        /* 天气气泡 */
+        .weather-bubble {
+            position: fixed; top: 20px; right: 20px; z-index: 900;
+            background: rgba(26,31,46,0.75); backdrop-filter: blur(8px);
+            border-radius: 25px; padding: 12px 20px;
+            border: 1px solid rgba(52,152,219,0.3);
+            cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .weather-bubble:hover {
+            background: rgba(26,31,46,0.9); border-color: var(--blue);
+            transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52,152,219,0.3);
+        }
+        .weather-bubble-icon { font-size: 1.5rem; color: var(--blue); }
+        .weather-bubble-info { text-align: left; }
+        .weather-bubble-city { font-size: 0.75rem; color: #aaa; }
+        .weather-bubble-temp { font-size: 1.1rem; font-weight: bold; }
+        /* 天气详情面板 */
+        .weather-panel {
+            position: fixed; top: 80px; right: 20px; z-index: 899;
+            background: rgba(26,31,46,0.92); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 25px; width: 260px;
+            border: 1px solid rgba(52,152,219,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none; text-align: left;
+        }
+        .weather-panel.show { display: block; }
+        .weather-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .weather-panel-city { font-size: 1.2rem; font-weight: bold; }
+        .weather-panel-close { background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem; }
+        .weather-panel-close:hover { color: white; }
+        .weather-panel-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .weather-detail-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; text-align: center; }
+        .weather-detail-item .label { font-size: 0.7rem; color: #888; }
+        .weather-detail-item .value { font-size: 1rem; font-weight: bold; margin-top: 3px; }
         #home-page { display:none; min-height:100vh; text-align:center; padding:40px 20px; animation:fadeIn 1s; }
         @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
         .home-container { max-width:800px; margin:0 auto; display:flex; flex-direction:column; justify-content:center; min-height:80vh; }
@@ -153,7 +188,6 @@
     </style>
 </head>
 <body>
-    <!-- 地域限制 -->
     <div id="geo-block" class="fullscreen-overlay" style="display: none;">
         <div class="geo-block">
             <div class="geo-icon"><i class="fas fa-shield-alt"></i></div>
@@ -171,7 +205,6 @@
         </div>
     </div>
 
-    <!-- 隐私政策 -->
     <div id="privacy-modal" class="fullscreen-overlay" style="display: none;">
         <div class="privacy-modal">
             <h2 class="privacy-title"><i class="fas fa-shield-alt"></i> 隐私政策</h2>
@@ -190,13 +223,11 @@
                 <p>本站可能包含外部链接，我们对这些网站的隐私措施不承担责任。</p>
                 <h3>七、联系我们</h3>
                 <p>如有疑问，请联系：kali0914@yeah.net</p>
-                <p style="margin-top: 20px; font-size: 0.85rem; color: #888;">最后更新：2026年5月31日</p>
             </div>
             <button class="privacy-btn" id="accept-privacy">同意并继续</button>
         </div>
     </div>
 
-    <!-- 加载动画（双语） -->
     <div class="loading-overlay" id="loadingOverlay">
         <div style="display:flex; flex-direction:column; align-items:center;">
             <div class="loading-spinner"></div>
@@ -207,21 +238,19 @@
         </div>
     </div>
 
-    <!-- 管理员登录 -->
     <div class="pin-modal" id="pinModal">
         <div class="pin-card">
             <h3><i class="fas fa-lock"></i> 管理员通道</h3>
-            <p>请输入6位数字密码</p>
+            <p>请输入5位邀请码</p>
             <div class="pin-inputs" id="pinInputs">
-                <input type="text" maxlength="1" class="pin-digit" id="pin0" autocomplete="off" inputmode="numeric">
-                <input type="text" maxlength="1" class="pin-digit" id="pin1" autocomplete="off" inputmode="numeric">
-                <input type="text" maxlength="1" class="pin-digit" id="pin2" autocomplete="off" inputmode="numeric">
-                <input type="text" maxlength="1" class="pin-digit" id="pin3" autocomplete="off" inputmode="numeric">
-                <input type="text" maxlength="1" class="pin-digit" id="pin4" autocomplete="off" inputmode="numeric">
-                <input type="text" maxlength="1" class="pin-digit" id="pin5" autocomplete="off" inputmode="numeric">
+                <input type="text" maxlength="1" class="pin-digit" id="pin0" autocomplete="off" inputmode="text">
+                <input type="text" maxlength="1" class="pin-digit" id="pin1" autocomplete="off" inputmode="text">
+                <input type="text" maxlength="1" class="pin-digit" id="pin2" autocomplete="off" inputmode="text">
+                <input type="text" maxlength="1" class="pin-digit" id="pin3" autocomplete="off" inputmode="text">
+                <input type="text" maxlength="1" class="pin-digit" id="pin4" autocomplete="off" inputmode="text">
             </div>
             <div class="pin-error" id="pinError"></div>
-            <button class="pin-btn" id="pinSubmit">验证登录</button>
+            <button class="pin-btn" id="pinSubmit">验证</button>
             <button class="close-pin" id="closePinModal"><i class="fas fa-times"></i> 取消</button>
         </div>
     </div>
@@ -229,6 +258,39 @@
     <div class="right-click-warning" id="rightClickWarning"><i class="fas fa-ban"></i><p>本站禁止使用右键</p></div>
     <audio id="bgMusic" src="music.MP3" preload="auto" loop></audio>
     <div class="music-player-btn" id="musicPlayerBtn" title="播放/暂停音乐"><i class="fas fa-music"></i></div>
+
+    <div class="weather-bubble" id="weatherBubble">
+        <i class="fas fa-sun weather-bubble-icon" id="weatherBubbleIcon"></i>
+        <div class="weather-bubble-info">
+            <div class="weather-bubble-city" id="weatherBubbleCity">加载中...</div>
+            <div class="weather-bubble-temp" id="weatherBubbleTemp">--°</div>
+        </div>
+    </div>
+
+    <div class="weather-panel" id="weatherPanel">
+        <div class="weather-panel-header">
+            <span class="weather-panel-city" id="weatherPanelCity"></span>
+            <button class="weather-panel-close" id="weatherPanelClose"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="weather-panel-detail">
+            <div class="weather-detail-item">
+                <div class="label">温度</div>
+                <div class="value" id="weatherDetailTemp">--°</div>
+            </div>
+            <div class="weather-detail-item">
+                <div class="label">天气</div>
+                <div class="value" id="weatherDetailWeather">--</div>
+            </div>
+            <div class="weather-detail-item">
+                <div class="label">风向</div>
+                <div class="value" id="weatherDetailWind">--</div>
+            </div>
+            <div class="weather-detail-item">
+                <div class="label">湿度</div>
+                <div class="value" id="weatherDetailHumidity">--</div>
+            </div>
+        </div>
+    </div>
 
     <div id="home-page">
         <div class="home-container">
@@ -242,7 +304,12 @@
                 <div class="home-quote-author" id="quoteAuthor">—— 孔子</div>
             </div>
             <div class="home-buttons"><button class="circular-action-btn" id="exploreBtn"><span>开始探索</span></button></div>
-            <div class="home-footer"><div class="footer-row"><div class="home-footer-copyright">阳光森林 © 2026 版权所有 V2.0</div><a href="#" class="admin-link" id="adminBtn"><i class="fas fa-user-shield"></i> 管理员通道</a></div></div>
+            <div class="home-footer">
+                <div class="footer-row">
+                    <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V2.4</div>
+                    <a href="#" class="admin-link" id="adminBtn"><i class="fas fa-user-shield"></i> 管理员通道</a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -255,7 +322,7 @@
                 <div class="sticky-notes-grid">
                     <a href="https://mp.weixin.qq.com/s/6j_7M7HDbVQGK2b3ZAPRYw" class="sticky-note" target="_blank">Hello,this World</a>
                     <a href="https://www.kdocs.cn/l/cbonhRM9lX11/" class="sticky-note" target="_blank">我的启示录</a>
-                    <a href="https://mp.weixin.qq.com/s?__biz=Mzk5MDIzOTc1OQ==&mid=2247483681&idx=1&sn=1509fd3b4d5a460c81e5923fd6de8d4f&chksm=c5e88c41f29f0557895d4a29b2288bad4a3ca859b0ef8829178c2c3378d5256a334c406e748d&cur_album_id=4430344855877353476&scene=189#wechat_redirect" class="sticky-note" target="_blank">花了1个月，在互联网上安了一个家</a>
+                    <a href="https://mp.weixin.qq.com/s/F3oyLjAK2QMVdiV_gxROYA" class="sticky-note" target="_blank">花了1个月，在互联网上安了一个家</a>
                 </div>
             </div>
             <div class="ai-section">
@@ -274,18 +341,25 @@
             <div class="security-tips-section" id="securityTipsSection"><h2 class="section-title">网络安全小贴士</h2><div class="security-tips-list" id="securityTipsListContainer"></div></div>
             <div class="contact-section" id="contactSection"><h2 class="section-title">联系我</h2><div class="contact-buttons-container" id="contactButtonsContainer"></div></div>
             <div class="friend-links-container" id="friendLinksContainer"><h3>友情链接</h3></div>
-            <div class="explore-footer"><div class="footer-row"><p>阳光森林 © 2026 版权所有 V2.0</p><a href="#" class="admin-link" id="adminBtnExplore"><i class="fas fa-user-shield"></i> 管理员通道</a></div></div>
+            <div class="explore-footer">
+                <div class="footer-row">
+                    <p>阳光森林 © 2026 版权所有 V2.4</p>
+                    <a href="#" class="admin-link" id="adminBtnExplore"><i class="fas fa-user-shield"></i> 管理员通道</a>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // 密钥分段
+        const AMAP_KEY = '0132157a873ec7d07ec9ca0c2cd6a608';
+
         function getApiKey() {
             const part1 = "sk-6a9409ced29f46ee";
             const part2 = "af5ecb12d0d04e71";
             return part1 + part2;
         }
 
+        // ==================== 完整的200句名人名言 ====================
         const quoteLibrary = [
             { text: "学而时习之，不亦说乎。", author: "孔子" },
             { text: "三人行，必有我师焉。择其善者而从之，其不善者而改之。", author: "孔子" },
@@ -490,7 +564,7 @@
                 { title: "警惕钓鱼", content: "不点击可疑链接，不下载不明附件，谨慎对待索要个人信息的要求。" }
             ],
             friendLinks: [{ name: "一位苹果软件开发者", url: "https://iamadman.com" }],
-            system: { copyright: "阳光森林 © 2026 版权所有 V2.0" }
+            system: { copyright: "阳光森林 © 2026 版权所有 V2.4" }
         };
 
         let conversation = [];
@@ -500,51 +574,80 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicPlayerBtn');
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const clearChatBtn = document.getElementById('clearChatBtn');
-
         const geoBlock = document.getElementById('geo-block');
         const privacyModal = document.getElementById('privacy-modal');
         const acceptPrivacyBtn = document.getElementById('accept-privacy');
 
-        // IP检测（竞速）
+        let userCity = '';
+
         async function checkGeoAccess() {
-            const fetchCountryIs = fetch('https://api.country.is/')
-                .then(res => res.json())
-                .then(data => data.country)
-                .catch(() => null);
-            const fetchIpapi = fetch('https://ipapi.co/json/')
-                .then(res => res.json())
-                .then(data => data.country_code)
-                .catch(() => null);
-            const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 5000));
-
-            const country = await Promise.race([fetchCountryIs, fetchIpapi, timeout]);
-
-            if (!country) {
-                document.getElementById('ip-country').textContent = '检测失败';
-                geoBlock.style.display = 'flex';
-                loadingOverlay.style.display = 'none';
-                return false;
-            }
-
-            document.getElementById('ip-country').textContent = country;
-            if (country !== 'CN') {
-                geoBlock.style.display = 'flex';
-                loadingOverlay.style.display = 'none';
-                return false;
-            }
-
-            loadingOverlay.style.display = 'none';
-            return true;
+            return new Promise((resolve) => {
+                const cb = 'amapIpCb_' + Date.now();
+                window[cb] = function(data) {
+                    if (data.status === '1' && data.province && data.province.length > 0) {
+                        document.getElementById('ip-country').textContent = data.city || data.province;
+                        userCity = data.city;
+                        resolve(true);
+                    } else {
+                        document.getElementById('ip-country').textContent = '国外/未知';
+                        resolve(false);
+                    }
+                    const s = document.querySelector(`script[src*="${cb}"]`);
+                    if (s) s.remove();
+                    delete window[cb];
+                };
+                const script = document.createElement('script');
+                script.src = `https://restapi.amap.com/v3/ip?key=${AMAP_KEY}&callback=${cb}`;
+                document.body.appendChild(script);
+            });
         }
+
+        function loadWeather(city) {
+            const cb = 'amapWeatherCb_' + Date.now();
+            window[cb] = function(data) {
+                if (data.status === '1' && data.lives && data.lives.length > 0) {
+                    const w = data.lives[0];
+                    const iconMap = {
+                        '晴': 'fa-sun', '多云': 'fa-cloud-sun', '阴': 'fa-cloud',
+                        '雨': 'fa-cloud-rain', '雪': 'fa-snowflake', '雾': 'fa-smog'
+                    };
+                    const iconClass = iconMap[w.weather] || 'fa-sun';
+                    document.getElementById('weatherBubbleIcon').className = 'fas ' + iconClass + ' weather-bubble-icon';
+                    document.getElementById('weatherBubbleCity').textContent = w.city;
+                    document.getElementById('weatherBubbleTemp').textContent = w.temperature + '°C';
+                    document.getElementById('weatherPanelCity').textContent = w.city;
+                    document.getElementById('weatherDetailTemp').textContent = w.temperature + '°C';
+                    document.getElementById('weatherDetailWeather').textContent = w.weather;
+                    document.getElementById('weatherDetailWind').textContent = w.winddirection + ' ' + w.windpower + '级';
+                    document.getElementById('weatherDetailHumidity').textContent = w.humidity || '--';
+                }
+                const s = document.querySelector(`script[src*="${cb}"]`);
+                if (s) s.remove();
+                delete window[cb];
+            };
+            const script = document.createElement('script');
+            script.src = `https://restapi.amap.com/v3/weather/weatherInfo?key=${AMAP_KEY}&city=${encodeURIComponent(city)}&extensions=base&callback=${cb}`;
+            document.body.appendChild(script);
+        }
+
+        document.getElementById('weatherBubble').addEventListener('click', function() {
+            document.getElementById('weatherPanel').classList.toggle('show');
+        });
+        document.getElementById('weatherPanelClose').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('weatherPanel').classList.remove('show');
+        });
+        document.addEventListener('click', function(e) {
+            const bubble = document.getElementById('weatherBubble');
+            const panel = document.getElementById('weatherPanel');
+            if (!bubble.contains(e.target) && !panel.contains(e.target)) {
+                panel.classList.remove('show');
+            }
+        });
 
         function hasAcceptedPrivacy() {
             return document.cookie.split('; ').find(row => row.startsWith('privacy_accepted='));
         }
-
         function setPrivacyCookie() {
             const expires = new Date();
             expires.setFullYear(expires.getFullYear() + 1);
@@ -557,13 +660,18 @@
             updateAllPages();
             initMusic();
             initPinModal();
+            if (userCity) loadWeather(userCity);
             homePage.style.display = 'block';
         }
 
         async function init() {
             const accessGranted = await checkGeoAccess();
-            if (!accessGranted) return;
-
+            if (!accessGranted) {
+                geoBlock.style.display = 'flex';
+                loadingOverlay.style.display = 'none';
+                return;
+            }
+            loadingOverlay.style.display = 'none';
             if (!hasAcceptedPrivacy()) {
                 privacyModal.style.display = 'flex';
                 acceptPrivacyBtn.addEventListener('click', () => {
@@ -595,7 +703,6 @@
             document.addEventListener('contextmenu', e => { e.preventDefault(); document.getElementById('rightClickWarning').style.display='block'; setTimeout(()=>document.getElementById('rightClickWarning').style.display='none',3000); });
             ['selectstart','dragstart','copy','cut','paste'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
         }
-
         function initMusic() {
             bgMusic.play().then(() => musicBtn.classList.add('playing')).catch(() => {
                 const play = () => { bgMusic.play(); document.removeEventListener('click', play); };
@@ -608,7 +715,6 @@
             bgMusic.addEventListener('play', () => musicBtn.classList.add('playing'));
             bgMusic.addEventListener('pause', () => musicBtn.classList.remove('playing'));
         }
-
         function initPinModal() {
             const modal = document.getElementById('pinModal');
             document.querySelectorAll('.admin-link').forEach(btn => btn.addEventListener('click', e => {
@@ -617,54 +723,49 @@
                 setTimeout(() => document.getElementById('pin0').focus(), 100);
             }));
             document.getElementById('closePinModal').addEventListener('click', () => modal.classList.remove('active'));
-            const inputs = [0,1,2,3,4,5].map(i => document.getElementById('pin'+i));
+            const inputs = [0,1,2,3,4].map(i => document.getElementById('pin'+i));
             inputs.forEach((inp, idx) => {
                 inp.addEventListener('input', e => {
-                    e.target.value = e.target.value.replace(/\D/g,'').charAt(0);
-                    if (e.target.value && idx < 5) inputs[idx+1].focus();
+                    let val = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+                    e.target.value = val.charAt(0);
+                    if (e.target.value && idx < 4) inputs[idx+1].focus();
                 });
-                inp.addEventListener('keydown', e => { if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx-1].focus(); });
-                inp.addEventListener('keypress', e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
+                inp.addEventListener('keydown', e => {
+                    if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx-1].focus();
+                });
             });
             document.getElementById('pinSubmit').addEventListener('click', () => {
-                const pin = inputs.map(i => i.value).join('');
-                if (pin === '070301') { window.location.href = 'admin.html'; }
-                else { document.getElementById('pinError').textContent = '密码错误，请重新输入'; inputs.forEach(i => i.value = ''); inputs[0].focus(); }
+                const code = inputs.map(i => i.value).join('');
+                if (code === 'ENJOY') {
+                    window.location.href = 'admin.html';
+                } else {
+                    document.getElementById('pinError').textContent = '邀请码错误，请重新输入';
+                    inputs.forEach(i => i.value = '');
+                    inputs[0].focus();
+                }
             });
         }
 
         async function sendMessage() {
             const msg = chatInput.value.trim();
             if (!msg) return;
-
             addMessage('user', msg);
             chatInput.value = '';
             conversation.push({ role: 'user', content: msg });
-
             const typingDiv = document.createElement('div');
             typingDiv.className = 'chat-msg assistant typing-indicator';
             typingDiv.innerHTML = '<span></span><span></span><span></span>';
             chatMessages.appendChild(typingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-
             try {
                 const API_KEY = getApiKey();
                 const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: 'deepseek-chat',
-                        messages: conversation,
-                        temperature: 0.7,
-                        max_tokens: 1000
-                    })
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+                    body: JSON.stringify({ model: 'deepseek-chat', messages: conversation, temperature: 0.7, max_tokens: 1000 })
                 });
                 const data = await res.json();
                 typingDiv.remove();
-
                 if (!res.ok || data.error) {
                     const errMsg = data.error?.message || `请求失败 (${res.status})`;
                     addMessage('assistant', '❌ ' + errMsg);
