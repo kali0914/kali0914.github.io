@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试发送验证码</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body { background: #0a0e17; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Microsoft YaHei'; }
+        .test-card { background: #1a1f2e; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; }
+        input, button { padding: 10px; margin: 10px 0; width: 100%; border-radius: 10px; border: none; }
+        button { background: #3498db; color: white; font-weight: bold; cursor: pointer; }
+        button:disabled { opacity: 0.6; }
+        .msg { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h2>邮件发送测试</h2>
+        <input type="email" id="test-email" placeholder="输入测试邮箱" />
+        <button id="test-send">发送验证码</button>
+        <div class="msg" id="test-msg"></div>
+    </div>
+
+    <script>
+        emailjs.init('BxxYjY2doKGPtnK3m');
+        const SERVICE_ID = 'service_cq7zvlp';
+        const TEMPLATE_ID = 'template_ue3fr0y';
+
+        document.getElementById('test-send').addEventListener('click', async () => {
+            const email = document.getElementById('test-email').value.trim();
+            const msg = document.getElementById('test-msg');
+            if (!email) { msg.textContent = '请输入邮箱'; return; }
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const btn = document.getElementById('test-send');
+            btn.disabled = true; btn.textContent = '发送中...';
+            try {
+                await emailjs.send(SERVICE_ID, TEMPLATE_ID, { to_email: email, code: code });
+                msg.innerHTML = `<span style="color:#2ecc71;">✅ 已发送至 ${email}，验证码：${code}</span>`;
+                btn.textContent = '重新发送';
+            } catch (e) {
+                msg.innerHTML = `<span style="color:#e74c3c;">❌ 发送失败：${e.message}</span>`;
+                btn.textContent = '发送验证码';
+            }
+            btn.disabled = false;
+        });
+    </script>
+</body>
+</html>
