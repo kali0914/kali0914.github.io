@@ -36,6 +36,7 @@
         }
         .auth-btn.secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
         .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52,152,219,0.3); }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .auth-link { color: var(--blue); cursor: pointer; display: inline-block; margin-top: 15px; text-decoration: none; }
         .auth-link:hover { text-decoration: underline; }
         .auth-message { margin-top: 15px; font-size: 0.9rem; }
@@ -57,9 +58,12 @@
     </div>
 
     <script>
+        // Supabase 配置
         const SUPABASE_URL = 'https://mvyswsnhufdoupbxxrwh.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12eXN3c25odWZkb3VwYnh4cndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjM0MzMsImV4cCI6MjA5NjI5OTQzM30.xg9DOX5ddnQ-XJWJUuhMP2kENiBTsL94UnzPlGfIuPA';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // EmailJS 初始化
         emailjs.init('BxxYjY2doKGPtnK3m');
         const EMAILJS_SERVICE_ID = 'service_cq7zvlp';
         const EMAILJS_TEMPLATE_ID = 'template_ue3fr0y';
@@ -70,12 +74,72 @@
         document.getElementById('send-verification-code').addEventListener('click', async () => {
             const email = document.getElementById('reg-email').value.trim();
             const msg = document.getElementById('reg-message');
-            if (!email) { msg.textContent = '请输入邮箱'; return; }
+            msg.style.color = '#e74c3c';
+
+            if (!email) {
+                msg.textContent = '请输入邮箱地址';
+                return;
+            }
+
             generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
             codeExpiry = Date.now() + 5 * 60 * 1000;
+            
             const btn = document.getElementById('send-verification-code');
-            btn.disabled = true; btn.textContent = '发送中...';
+            btn.disabled = true;
+            btn.textContent = '发送中...';
+            msg.textContent = '正在连接邮件服务...';
+
             try {
+                const response = await emailjs.send(
+                    EMAILJS_SERVICE_ID,
+                    EMAILJS_TEMPLATE_ID,
+                    {
+                        to_email: email,
+                        code: generatedCode
+                    }
+                );
+                
+                console.log('✅ 发送成功', response);
+                msg.style.color = '#2ecc71';
+                msg.textContent = '验证码已发送，请查收邮件（注意查看垃圾箱）';
+                btn.textContent = '重新发送';
+                btn.disabled = false;
+            } catch (error) {
+                console.error('❌ 发送失败', error);
+                msg.style.color = '#e74c3c';
+                // 更稳妥的错误信息获取
+                const errMsg = error.text || error.message || JSON.stringify(error);
+                msg.textContent = '发送失败：' + errMsg;
+                btn.textContent = '发送验证码';
+                btn.disabled = false;
+            }
+        });
+
+        // 注册提交（保持不变）
+        document.getElementById('reg-submit').addEventListener('click', async () => {
+            const email = document.getElementById('reg-email').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const msg = document.getElementById('reg-message');
+            msg.style.color = '#e74c3c';
+
+            if (!email || !code || !password) { msg.textContent = '请填写所有字段'; return; }
+            if (password.length < 6) { msg.textContent = '密码至少6位'; return; }
+            if (Date.now() > codeExpiry) { msg.textContent = '验证码已过期，请重新获取'; return; }
+            if (code !== generatedCode) { msg.textContent = '验证码错误'; return; }
+
+            msg.textContent = '正在注册...';
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) { msg.textContent = error.message; }
+            else {
+                msg.style.color = '#2ecc71';
+                msg.textContent = '注册成功！即将跳转...';
+                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>            try {
                 await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { to_email: email, code: generatedCode });
                 msg.textContent = '验证码已发送'; msg.style.color = '#2ecc71';
                 btn.textContent = '重新发送'; btn.disabled = false;
