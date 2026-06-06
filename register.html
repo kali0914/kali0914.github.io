@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>注册 - 阳光森林</title>
+    <link rel="icon" href="photo1.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        :root { --blue: #3498db; --dark-bg: #0a0e17; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+        body {
+            background-color: var(--dark-bg); color: white; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background-image: linear-gradient(rgba(10,14,23,0.7), rgba(10,14,23,0.7)), url('photo3.jpg');
+            background-size: cover; background-position: center;
+        }
+        .auth-card {
+            background: rgba(26,31,46,0.85); backdrop-filter: blur(15px);
+            border-radius: 25px; padding: 40px; max-width: 420px; width: 90%;
+            border: 1px solid rgba(52,152,219,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .auth-card h2 { margin-bottom: 25px; }
+        .auth-input {
+            width: 100%; padding: 12px 18px; margin: 10px 0; border-radius: 10px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; outline: none;
+        }
+        .auth-input:focus { border-color: var(--blue); }
+        .auth-btn {
+            background: linear-gradient(45deg, var(--blue), #e84393);
+            border: none; padding: 12px; width: 100%; font-weight: bold; color: white;
+            border-radius: 50px; cursor: pointer; transition: 0.3s; margin: 10px 0;
+        }
+        .auth-btn.secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52,152,219,0.3); }
+        .auth-link { color: var(--blue); cursor: pointer; display: inline-block; margin-top: 15px; text-decoration: none; }
+        .auth-link:hover { text-decoration: underline; }
+        .auth-message { margin-top: 15px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h2><i class="fas fa-user-plus"></i> 注册</h2>
+        <input type="email" class="auth-input" id="reg-email" placeholder="邮箱" />
+        <button class="auth-btn secondary" id="send-verification-code">发送验证码</button>
+        <input type="text" class="auth-input" id="reg-code" placeholder="验证码" maxlength="6" />
+        <input type="password" class="auth-input" id="reg-password" placeholder="设置密码 (至少6位)" />
+        <button class="auth-btn" id="reg-submit">完成</button>
+        <div class="auth-message" id="reg-message"></div>
+        <a class="auth-link" href="login.html">已有账号？去登录</a>
+        <div style="margin-top:20px;">
+            <a class="auth-link" href="index.html"><i class="fas fa-arrow-left"></i> 返回首页</a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://mvyswsnhufdoupbxxrwh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12eXN3c25odWZkb3VwYnh4cndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjM0MzMsImV4cCI6MjA5NjI5OTQzM30.xg9DOX5ddnQ-XJWJUuhMP2kENiBTsL94UnzPlGfIuPA';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        emailjs.init('BxxYjY2doKGPtnK3m');
+        const EMAILJS_SERVICE_ID = 'service_cq7zvlp';
+        const EMAILJS_TEMPLATE_ID = 'template_ue3fr0y';
+
+        let generatedCode = '';
+        let codeExpiry = 0;
+
+        document.getElementById('send-verification-code').addEventListener('click', async () => {
+            const email = document.getElementById('reg-email').value.trim();
+            const msg = document.getElementById('reg-message');
+            if (!email) { msg.textContent = '请输入邮箱'; return; }
+            generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            codeExpiry = Date.now() + 5 * 60 * 1000;
+            const btn = document.getElementById('send-verification-code');
+            btn.disabled = true; btn.textContent = '发送中...';
+            try {
+                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { to_email: email, code: generatedCode });
+                msg.textContent = '验证码已发送'; msg.style.color = '#2ecc71';
+                btn.textContent = '重新发送'; btn.disabled = false;
+            } catch (e) {
+                msg.textContent = '发送失败：' + e.message; msg.style.color = '#e74c3c';
+                btn.textContent = '发送验证码'; btn.disabled = false;
+            }
+        });
+
+        document.getElementById('reg-submit').addEventListener('click', async () => {
+            const email = document.getElementById('reg-email').value.trim();
+            const code = document.getElementById('reg-code').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const msg = document.getElementById('reg-message');
+            if (!email || !code || !password) { msg.textContent = '请填写所有字段'; return; }
+            if (password.length < 6) { msg.textContent = '密码至少6位'; return; }
+            if (Date.now() > codeExpiry) { msg.textContent = '验证码已过期'; return; }
+            if (code !== generatedCode) { msg.textContent = '验证码错误'; return; }
+            msg.textContent = '正在注册...';
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) { msg.textContent = error.message; }
+            else { alert('注册成功！'); window.location.href = 'index.html'; }
+        });
+    </script>
+</body>
+</html>
