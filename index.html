@@ -6,6 +6,7 @@
     <title>阳光森林 - 网络安全空间</title>
     <link rel="icon" href="photo1.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --blue: #3498db; --red: #e74c3c; --pink: #e84393; --yellow: #f1c40f;
@@ -81,6 +82,27 @@
         .pin-btn { background:linear-gradient(45deg,#3498db,#e84393); border:none; padding:12px 30px; font-size:1.2rem; font-weight:bold; color:white; border-radius:50px; cursor:pointer; transition:0.3s; margin-top:10px; }
         .pin-btn:hover { transform:translateY(-3px); box-shadow:0 10px 20px rgba(52,152,219,0.3); }
         .close-pin { margin-top:20px; background:none; border:none; color:#888; cursor:pointer; font-size:0.9rem; }
+        /* 邮箱弹窗 */
+        .email-modal {
+            background: rgba(26,31,46,0.95); backdrop-filter: blur(15px);
+            border-radius: 30px; padding: 40px; max-width: 500px; width: 90%;
+            border: 1px solid rgba(52,152,219,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .email-modal h3 { font-size: 1.8rem; margin-bottom: 15px; color: white; }
+        .email-input { width: 100%; padding: 14px 20px; margin: 15px 0; border-radius: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; outline: none; font-size: 1rem; }
+        .email-input:focus { border-color: var(--blue); }
+        .email-btn {
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            border: none; padding: 12px 30px; font-size: 1rem; font-weight: bold;
+            color: white; border-radius: 50px; cursor: pointer; transition: 0.3s;
+            margin: 5px;
+        }
+        .email-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52,152,219,0.3); }
+        .email-btn.secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        .email-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .email-message { margin-top: 15px; font-size: 0.9rem; color: #e74c3c; }
+        .email-message.success { color: #2ecc71; }
         /* 天气气泡 */
         .weather-bubble {
             position: fixed; top: 20px; right: 20px; z-index: 900;
@@ -99,7 +121,6 @@
         .weather-bubble-info { text-align: left; }
         .weather-bubble-city { font-size: 0.75rem; color: #aaa; }
         .weather-bubble-temp { font-size: 1.1rem; font-weight: bold; }
-        /* 天气详情面板 */
         .weather-panel {
             position: fixed; top: 80px; right: 20px; z-index: 899;
             background: rgba(26,31,46,0.92); backdrop-filter: blur(10px);
@@ -255,6 +276,22 @@
         </div>
     </div>
 
+    <!-- Supabase 邮箱验证弹窗 -->
+    <div class="pin-modal" id="emailModal">
+        <div class="email-modal">
+            <h3><i class="fas fa-envelope"></i> 邮箱验证码登录</h3>
+            <p style="color:#aaa; margin-bottom:20px;">输入您的邮箱，获取验证码</p>
+            <input type="email" class="email-input" id="email-input" placeholder="you@example.com" />
+            <div id="email-action-row">
+                <button class="email-btn" id="send-code-btn">发送验证码</button>
+                <button class="email-btn secondary" id="close-email-btn">取消</button>
+            </div>
+            <input type="text" class="email-input" id="code-input" placeholder="请输入6位验证码" maxlength="6" style="display:none;" />
+            <button class="email-btn" id="verify-code-btn" style="display:none;">验证并登录</button>
+            <div class="email-message" id="email-message"></div>
+        </div>
+    </div>
+
     <div class="right-click-warning" id="rightClickWarning"><i class="fas fa-ban"></i><p>本站禁止使用右键</p></div>
     <audio id="bgMusic" src="music.MP3" preload="auto" loop></audio>
     <div class="music-player-btn" id="musicPlayerBtn" title="播放/暂停音乐"><i class="fas fa-music"></i></div>
@@ -273,22 +310,10 @@
             <button class="weather-panel-close" id="weatherPanelClose"><i class="fas fa-times"></i></button>
         </div>
         <div class="weather-panel-detail">
-            <div class="weather-detail-item">
-                <div class="label">温度</div>
-                <div class="value" id="weatherDetailTemp">--°</div>
-            </div>
-            <div class="weather-detail-item">
-                <div class="label">天气</div>
-                <div class="value" id="weatherDetailWeather">--</div>
-            </div>
-            <div class="weather-detail-item">
-                <div class="label">风向</div>
-                <div class="value" id="weatherDetailWind">--</div>
-            </div>
-            <div class="weather-detail-item">
-                <div class="label">湿度</div>
-                <div class="value" id="weatherDetailHumidity">--</div>
-            </div>
+            <div class="weather-detail-item"><div class="label">温度</div><div class="value" id="weatherDetailTemp">--°</div></div>
+            <div class="weather-detail-item"><div class="label">天气</div><div class="value" id="weatherDetailWeather">--</div></div>
+            <div class="weather-detail-item"><div class="label">风向</div><div class="value" id="weatherDetailWind">--</div></div>
+            <div class="weather-detail-item"><div class="label">湿度</div><div class="value" id="weatherDetailHumidity">--</div></div>
         </div>
     </div>
 
@@ -308,6 +333,7 @@
                 <div class="footer-row">
                     <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V2.4</div>
                     <a href="#" class="admin-link" id="adminBtn"><i class="fas fa-user-shield"></i> 管理员通道</a>
+                    <a href="#" class="admin-link" id="emailLoginBtn"><i class="fas fa-envelope"></i> 邮箱登录</a>
                 </div>
             </div>
         </div>
@@ -345,21 +371,104 @@
                 <div class="footer-row">
                     <p>阳光森林 © 2026 版权所有 V2.4</p>
                     <a href="#" class="admin-link" id="adminBtnExplore"><i class="fas fa-user-shield"></i> 管理员通道</a>
+                    <a href="#" class="admin-link" id="emailLoginBtnExplore"><i class="fas fa-envelope"></i> 邮箱登录</a>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const AMAP_KEY = '0132157a873ec7d07ec9ca0c2cd6a608';
+        // ==================== Supabase 初始化 ====================
+        const SUPABASE_URL = 'https://mvyswsnhufdoupbxxrwh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12eXN3c25odWZkb3VwYnh4cndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjM0MzMsImV4cCI6MjA5NjI5OTQzM30.xg9DOX5ddnQ-XJWJUuhMP2kENiBTsL94UnzPlGfIuPA';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // 邮箱弹窗相关
+        const emailModal = document.getElementById('emailModal');
+        const emailInput = document.getElementById('email-input');
+        const sendCodeBtn = document.getElementById('send-code-btn');
+        const closeEmailBtn = document.getElementById('close-email-btn');
+        const codeInput = document.getElementById('code-input');
+        const verifyCodeBtn = document.getElementById('verify-code-btn');
+        const emailMessage = document.getElementById('email-message');
+
+        // 打开邮箱弹窗
+        document.querySelectorAll('#emailLoginBtn, #emailLoginBtnExplore').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                emailModal.classList.add('active');
+                emailInput.value = '';
+                codeInput.value = '';
+                codeInput.style.display = 'none';
+                verifyCodeBtn.style.display = 'none';
+                sendCodeBtn.style.display = 'inline-block';
+                document.getElementById('email-action-row').style.display = 'block';
+                emailMessage.textContent = '';
+            });
+        });
+
+        closeEmailBtn.addEventListener('click', () => emailModal.classList.remove('active'));
+
+        // 发送验证码（Supabase OTP）
+        sendCodeBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            if (!email) { emailMessage.textContent = '请输入邮箱地址'; return; }
+
+            sendCodeBtn.disabled = true;
+            emailMessage.textContent = '正在发送...';
+            emailMessage.className = 'email-message';
+
+            const { error } = await supabase.auth.signInWithOtp({ email });
+            if (error) {
+                emailMessage.textContent = '发送失败：' + error.message;
+                emailMessage.className = 'email-message';
+                sendCodeBtn.disabled = false;
+            } else {
+                emailMessage.textContent = '验证码已发送，请查收邮件';
+                emailMessage.className = 'email-message success';
+                codeInput.style.display = 'block';
+                verifyCodeBtn.style.display = 'inline-block';
+                sendCodeBtn.style.display = 'none';
+                document.getElementById('email-action-row').style.display = 'none';
+            }
+        });
+
+        // 验证验证码（Supabase OTP）
+        verifyCodeBtn.addEventListener('click', async () => {
+            const token = codeInput.value.trim();
+            const email = emailInput.value.trim();
+            if (!token) { emailMessage.textContent = '请输入验证码'; return; }
+
+            const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+            if (error) {
+                emailMessage.textContent = '验证失败：' + error.message;
+                emailMessage.className = 'email-message';
+            } else {
+                localStorage.setItem('logged_in', 'true');
+                localStorage.setItem('user_email', email);
+                emailModal.classList.remove('active');
+                alert('登录成功！');
+            }
+        });
+
+        // 检查登录状态
+        async function checkLoginStatus() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                localStorage.setItem('logged_in', 'true');
+                localStorage.setItem('user_email', session.user.email);
+            }
+        }
+        checkLoginStatus();
+
+        // 其余功能保持不变
+        const AMAP_KEY = '0132157a873ec7d07ec9ca0c2cd6a608';
         function getApiKey() {
             const part1 = "sk-6a9409ced29f46ee";
             const part2 = "af5ecb12d0d04e71";
             return part1 + part2;
         }
 
-        // 完整的200句名人名言
         const quoteLibrary = [
             { text: "学而时习之，不亦说乎。", author: "孔子" },
             { text: "三人行，必有我师焉。择其善者而从之，其不善者而改之。", author: "孔子" },
@@ -568,7 +677,6 @@
         };
 
         let conversation = [];
-
         const homePage = document.getElementById('home-page');
         const explorePage = document.getElementById('explore-page');
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -577,15 +685,10 @@
         const geoBlock = document.getElementById('geo-block');
         const privacyModal = document.getElementById('privacy-modal');
         const acceptPrivacyBtn = document.getElementById('accept-privacy');
+        let userCity = "南昌";
 
-        let userCity = "南昌"; // 默认城市
-
-        // ==================== 完全关闭地域拦截 ====================
         async function checkGeoAccess() {
-            // 直接放行，不再调用任何接口
             document.getElementById('ip-country').textContent = '已放行';
-            // 如果想自动获取城市天气，可以取消下面的注释，但为了稳定，这里直接用默认城市
-            // 如果希望根据IP自动获取，可以启用原来的高德IP接口，但这里已关闭拦截，直接使用默认城市
             return true;
         }
 
@@ -594,12 +697,8 @@
             window[cb] = function(data) {
                 if (data.status === '1' && data.lives && data.lives.length > 0) {
                     const w = data.lives[0];
-                    const iconMap = {
-                        '晴': 'fa-sun', '多云': 'fa-cloud-sun', '阴': 'fa-cloud',
-                        '雨': 'fa-cloud-rain', '雪': 'fa-snowflake', '雾': 'fa-smog'
-                    };
-                    const iconClass = iconMap[w.weather] || 'fa-sun';
-                    document.getElementById('weatherBubbleIcon').className = 'fas ' + iconClass + ' weather-bubble-icon';
+                    const iconMap = { '晴': 'fa-sun', '多云': 'fa-cloud-sun', '阴': 'fa-cloud', '雨': 'fa-cloud-rain', '雪': 'fa-snowflake', '雾': 'fa-smog' };
+                    document.getElementById('weatherBubbleIcon').className = 'fas ' + (iconMap[w.weather] || 'fa-sun') + ' weather-bubble-icon';
                     document.getElementById('weatherBubbleCity').textContent = w.city;
                     document.getElementById('weatherBubbleTemp').textContent = w.temperature + '°C';
                     document.getElementById('weatherPanelCity').textContent = w.city;
@@ -617,29 +716,16 @@
             document.body.appendChild(script);
         }
 
-        document.getElementById('weatherBubble').addEventListener('click', function() {
-            document.getElementById('weatherPanel').classList.toggle('show');
-        });
-        document.getElementById('weatherPanelClose').addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.getElementById('weatherPanel').classList.remove('show');
-        });
-        document.addEventListener('click', function(e) {
-            const bubble = document.getElementById('weatherBubble');
-            const panel = document.getElementById('weatherPanel');
-            if (!bubble.contains(e.target) && !panel.contains(e.target)) {
-                panel.classList.remove('show');
-            }
+        document.getElementById('weatherBubble').addEventListener('click', () => document.getElementById('weatherPanel').classList.toggle('show'));
+        document.getElementById('weatherPanelClose').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('weatherPanel').classList.remove('show'); });
+        document.addEventListener('click', (e) => {
+            const b = document.getElementById('weatherBubble');
+            const p = document.getElementById('weatherPanel');
+            if (!b.contains(e.target) && !p.contains(e.target)) p.classList.remove('show');
         });
 
-        function hasAcceptedPrivacy() {
-            return document.cookie.split('; ').find(row => row.startsWith('privacy_accepted='));
-        }
-        function setPrivacyCookie() {
-            const expires = new Date();
-            expires.setFullYear(expires.getFullYear() + 1);
-            document.cookie = `privacy_accepted=true; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
-        }
+        function hasAcceptedPrivacy() { return document.cookie.split('; ').find(row => row.startsWith('privacy_accepted=')); }
+        function setPrivacyCookie() { const d = new Date(); d.setFullYear(d.getFullYear()+1); document.cookie = `privacy_accepted=true; expires=${d.toUTCString()}; path=/; SameSite=Lax`; }
 
         function startSite() {
             pickRandomQuote();
@@ -652,20 +738,12 @@
         }
 
         async function init() {
-            // 直接放行，不再调用接口
-            const accessGranted = await checkGeoAccess();
-            // 现在accessGranted始终为true，不会进入拒绝分支
+            await checkGeoAccess();
             loadingOverlay.style.display = 'none';
             if (!hasAcceptedPrivacy()) {
                 privacyModal.style.display = 'flex';
-                acceptPrivacyBtn.addEventListener('click', () => {
-                    setPrivacyCookie();
-                    privacyModal.style.display = 'none';
-                    startSite();
-                });
-            } else {
-                startSite();
-            }
+                acceptPrivacyBtn.addEventListener('click', () => { setPrivacyCookie(); privacyModal.style.display = 'none'; startSite(); });
+            } else { startSite(); }
         }
 
         function pickRandomQuote() {
@@ -673,60 +751,37 @@
             document.getElementById('quoteText').textContent = quoteLibrary[i].text;
             document.getElementById('quoteAuthor').textContent = '—— ' + quoteLibrary[i].author;
         }
-
         function updateAllPages() {
             document.querySelector('#home-page .home-footer-copyright').textContent = defaultSettings.system.copyright;
             document.querySelector('#explore-page .explore-footer p').textContent = defaultSettings.system.copyright;
-            document.getElementById('profileSection').innerHTML = `<div class="profile-header"><div class="profile-avatar"><img src="${defaultSettings.profile.avatar}" alt="头像"></div><div class="profile-info"><h2>${defaultSettings.profile.name}</h2><p>${defaultSettings.profile.tagline}</p></div></div><div class="profile-content">${defaultSettings.profile.description.split('\n').map(p => `<p>${p}</p>`).join('')}</div>`;
-            document.getElementById('securityTipsListContainer').innerHTML = defaultSettings.securityTips.map(t => `<div class="security-tip-card"><h4><i class="fas fa-shield-alt"></i> ${t.title}</h4><p>${t.content}</p></div>`).join('');
-            document.getElementById('contactButtonsContainer').innerHTML = defaultSettings.contacts.map(c => `<a href="${c.url}" class="contact-btn" target="${c.url.startsWith('mailto')?'_self':'_blank'}"><i class="${c.icon}"></i><div><div>${c.name}</div><div class="contact-value">${c.value}</div></div></a>`).join('');
-            document.getElementById('friendLinksContainer').innerHTML = '<h3>友情链接</h3>' + defaultSettings.friendLinks.map(f => `<a href="${f.url}" class="friend-link-item" target="_blank"><i class="fas fa-external-link-alt"></i> ${f.name}</a>`).join('');
+            document.getElementById('profileSection').innerHTML = `<div class="profile-header"><div class="profile-avatar"><img src="${defaultSettings.profile.avatar}" alt="头像"></div><div class="profile-info"><h2>${defaultSettings.profile.name}</h2><p>${defaultSettings.profile.tagline}</p></div></div><div class="profile-content">${defaultSettings.profile.description.split('\n').map(p=>`<p>${p}</p>`).join('')}</div>`;
+            document.getElementById('securityTipsListContainer').innerHTML = defaultSettings.securityTips.map(t=>`<div class="security-tip-card"><h4><i class="fas fa-shield-alt"></i> ${t.title}</h4><p>${t.content}</p></div>`).join('');
+            document.getElementById('contactButtonsContainer').innerHTML = defaultSettings.contacts.map(c=>`<a href="${c.url}" class="contact-btn" target="${c.url.startsWith('mailto')?'_self':'_blank'}"><i class="${c.icon}"></i><div><div>${c.name}</div><div class="contact-value">${c.value}</div></div></a>`).join('');
+            document.getElementById('friendLinksContainer').innerHTML = '<h3>友情链接</h3>' + defaultSettings.friendLinks.map(f=>`<a href="${f.url}" class="friend-link-item" target="_blank"><i class="fas fa-external-link-alt"></i> ${f.name}</a>`).join('');
         }
-
         function setupRightClick() {
             document.addEventListener('contextmenu', e => { e.preventDefault(); document.getElementById('rightClickWarning').style.display='block'; setTimeout(()=>document.getElementById('rightClickWarning').style.display='none',3000); });
             ['selectstart','dragstart','copy','cut','paste'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
         }
         function initMusic() {
-            bgMusic.play().then(() => musicBtn.classList.add('playing')).catch(() => {
-                const play = () => { bgMusic.play(); document.removeEventListener('click', play); };
-                document.addEventListener('click', play);
-            });
-            musicBtn.addEventListener('click', () => {
-                if (bgMusic.paused) bgMusic.play().then(() => musicBtn.classList.add('playing'));
-                else bgMusic.pause();
-            });
+            bgMusic.play().then(() => musicBtn.classList.add('playing')).catch(() => { const play = () => { bgMusic.play(); document.removeEventListener('click', play); }; document.addEventListener('click', play); });
+            musicBtn.addEventListener('click', () => { if (bgMusic.paused) bgMusic.play().then(()=>musicBtn.classList.add('playing')); else bgMusic.pause(); });
             bgMusic.addEventListener('play', () => musicBtn.classList.add('playing'));
             bgMusic.addEventListener('pause', () => musicBtn.classList.remove('playing'));
         }
         function initPinModal() {
             const modal = document.getElementById('pinModal');
-            document.querySelectorAll('.admin-link').forEach(btn => btn.addEventListener('click', e => {
-                e.preventDefault();
-                modal.classList.add('active');
-                setTimeout(() => document.getElementById('pin0').focus(), 100);
-            }));
+            document.querySelectorAll('.admin-link').forEach(btn => btn.addEventListener('click', e => { e.preventDefault(); modal.classList.add('active'); setTimeout(()=>document.getElementById('pin0').focus(),100); }));
             document.getElementById('closePinModal').addEventListener('click', () => modal.classList.remove('active'));
-            const inputs = [0,1,2,3,4].map(i => document.getElementById('pin'+i));
-            inputs.forEach((inp, idx) => {
-                inp.addEventListener('input', e => {
-                    let val = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
-                    e.target.value = val.charAt(0);
-                    if (e.target.value && idx < 4) inputs[idx+1].focus();
-                });
-                inp.addEventListener('keydown', e => {
-                    if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx-1].focus();
-                });
+            const inputs = [0,1,2,3,4].map(i=>document.getElementById('pin'+i));
+            inputs.forEach((inp,idx) => {
+                inp.addEventListener('input', e => { let val=e.target.value.replace(/[^a-zA-Z]/g,'').toUpperCase(); e.target.value=val.charAt(0); if(e.target.value&&idx<4)inputs[idx+1].focus(); });
+                inp.addEventListener('keydown', e => { if(e.key==='Backspace'&&!inp.value&&idx>0)inputs[idx-1].focus(); });
             });
             document.getElementById('pinSubmit').addEventListener('click', () => {
-                const code = inputs.map(i => i.value).join('');
-                if (code === 'ENJOY') {
-                    window.location.href = 'admin.html';
-                } else {
-                    document.getElementById('pinError').textContent = '邀请码错误，请重新输入';
-                    inputs.forEach(i => i.value = '');
-                    inputs[0].focus();
-                }
+                const code = inputs.map(i=>i.value).join('');
+                if (code === 'ENJOY') window.location.href='admin.html';
+                else { document.getElementById('pinError').textContent='邀请码错误，请重新输入'; inputs.forEach(i=>i.value=''); inputs[0].focus(); }
             });
         }
 
@@ -736,18 +791,10 @@
             addMessage('user', msg);
             chatInput.value = '';
             conversation.push({ role: 'user', content: msg });
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'chat-msg assistant typing-indicator';
-            typingDiv.innerHTML = '<span></span><span></span><span></span>';
-            chatMessages.appendChild(typingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            const typingDiv = document.createElement('div'); typingDiv.className='chat-msg assistant typing-indicator'; typingDiv.innerHTML='<span></span><span></span><span></span>'; chatMessages.appendChild(typingDiv); chatMessages.scrollTop = chatMessages.scrollHeight;
             try {
                 const API_KEY = getApiKey();
-                const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
-                    body: JSON.stringify({ model: 'deepseek-chat', messages: conversation, temperature: 0.7, max_tokens: 1000 })
-                });
+                const res = await fetch('https://api.deepseek.com/v1/chat/completions', { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`}, body:JSON.stringify({model:'deepseek-chat', messages:conversation, temperature:0.7, max_tokens:1000}) });
                 const data = await res.json();
                 typingDiv.remove();
                 if (!res.ok || data.error) {
@@ -758,41 +805,18 @@
                     addMessage('assistant', reply);
                     conversation.push({ role: 'assistant', content: reply });
                 }
-            } catch (err) {
-                typingDiv.remove();
-                addMessage('assistant', '❌ 网络错误，请稍后重试');
-            }
+            } catch (err) { typingDiv.remove(); addMessage('assistant', '❌ 网络错误，请稍后重试'); }
         }
-
         function addMessage(role, text) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `chat-msg ${role}`;
-            const bubble = document.createElement('div');
-            bubble.className = 'msg-bubble';
-            bubble.textContent = text;
-            msgDiv.appendChild(bubble);
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            const msgDiv = document.createElement('div'); msgDiv.className = `chat-msg ${role}`; const bubble = document.createElement('div'); bubble.className='msg-bubble'; bubble.textContent=text; msgDiv.appendChild(bubble); chatMessages.appendChild(msgDiv); chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
-        function clearChat() {
-            conversation = [];
-            chatMessages.innerHTML = '<div class="chat-msg assistant"><div class="msg-bubble">对话已清空，有什么可以帮你的吗？</div></div>';
-        }
+        function clearChat() { conversation = []; chatMessages.innerHTML = '<div class="chat-msg assistant"><div class="msg-bubble">对话已清空，有什么可以帮你的吗？</div></div>'; }
 
         sendBtn.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
         clearChatBtn.addEventListener('click', clearChat);
-
-        document.getElementById('exploreBtn').addEventListener('click', () => {
-            homePage.style.display = 'none';
-            explorePage.style.display = 'block';
-        });
-        document.getElementById('backToHome').addEventListener('click', e => {
-            e.preventDefault();
-            explorePage.style.display = 'none';
-            homePage.style.display = 'block';
-        });
+        document.getElementById('exploreBtn').addEventListener('click', () => { homePage.style.display='none'; explorePage.style.display='block'; });
+        document.getElementById('backToHome').addEventListener('click', e => { e.preventDefault(); explorePage.style.display='none'; homePage.style.display='block'; });
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
