@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>登录 - 阳光森林</title>
+    <link rel="icon" href="photo1.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --blue: #3498db; --dark-bg: #0a0e17; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+        body {
+            background-color: var(--dark-bg); color: white; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background-image: linear-gradient(rgba(10,14,23,0.7), rgba(10,14,23,0.7)), url('photo3.jpg');
+            background-size: cover; background-position: center;
+        }
+        .auth-card {
+            background: rgba(26,31,46,0.85); backdrop-filter: blur(15px);
+            border-radius: 25px; padding: 40px; max-width: 420px; width: 90%;
+            border: 1px solid rgba(52,152,219,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .auth-card h2 { margin-bottom: 25px; }
+        .auth-input {
+            width: 100%; padding: 12px 18px; margin: 10px 0; border-radius: 10px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; outline: none;
+        }
+        .auth-input:focus { border-color: var(--blue); }
+        .auth-btn {
+            background: linear-gradient(45deg, var(--blue), #e84393);
+            border: none; padding: 12px; width: 100%; font-weight: bold; color: white;
+            border-radius: 50px; cursor: pointer; transition: 0.3s; margin: 10px 0;
+        }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52,152,219,0.3); }
+        .auth-link { color: var(--blue); cursor: pointer; display: inline-block; margin-top: 15px; text-decoration: none; }
+        .auth-link:hover { text-decoration: underline; }
+        .auth-message { margin-top: 15px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h2><i class="fas fa-sign-in-alt"></i> 登录</h2>
+        <input type="email" class="auth-input" id="login-email" placeholder="邮箱" />
+        <input type="password" class="auth-input" id="login-password" placeholder="密码" />
+        <button class="auth-btn" id="login-btn">登录</button>
+        <div class="auth-message" id="login-message"></div>
+        <a class="auth-link" href="register.html">没有账号？立即注册</a>
+        <div style="margin-top:20px;">
+            <a class="auth-link" href="index.html"><i class="fas fa-arrow-left"></i> 返回首页</a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://mvyswsnhufdoupbxxrwh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12eXN3c25odWZkb3VwYnh4cndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MjM0MzMsImV4cCI6MjA5NjI5OTQzM30.xg9DOX5ddnQ-XJWJUuhMP2kENiBTsL94UnzPlGfIuPA';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const msg = document.getElementById('login-message');
+            if (!email || !password) { msg.textContent = '请填写完整信息'; return; }
+            msg.textContent = '正在登录...';
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) { msg.textContent = error.message; }
+            else { window.location.href = 'index.html'; }
+        });
+    </script>
+</body>
+</html>
