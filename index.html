@@ -58,6 +58,17 @@
         .pin-btn { background:linear-gradient(45deg,#3498db,#e84393); border:none; padding:12px 30px; font-size:1.2rem; font-weight:bold; color:white; border-radius:50px; cursor:pointer; transition:0.3s; margin-top:10px; }
         .pin-btn:hover { transform:translateY(-3px); box-shadow:0 10px 20px rgba(52,152,219,0.3); }
         .close-pin { margin-top:20px; background:none; border:none; color:#888; cursor:pointer; font-size:0.9rem; }
+        /* 右上角登录按钮 */
+        .top-right-login {
+            position: fixed; top: 20px; right: 20px; z-index: 1001;
+            background: rgba(26,31,46,0.7); backdrop-filter: blur(8px);
+            border-radius: 25px; padding: 8px 18px;
+            border: 1px solid rgba(52,152,219,0.3);
+            cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 8px;
+            color: white; font-size: 0.9rem; text-decoration: none;
+        }
+        .top-right-login:hover { background: rgba(26,31,46,0.9); border-color: var(--blue); }
         #home-page { display:none; min-height:100vh; text-align:center; padding:40px 20px; animation:fadeIn 1s; }
         @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
         .home-container { max-width:800px; margin:0 auto; display:flex; flex-direction:column; justify-content:center; min-height:80vh; }
@@ -129,6 +140,9 @@
     </style>
 </head>
 <body>
+    <!-- 右上角登录按钮 -->
+    <a href="login.html" class="top-right-login"><i class="fas fa-user"></i> 登陆（内测）</a>
+
     <!-- 隐私政策弹窗 -->
     <div id="privacy-modal" class="fullscreen-overlay" style="display: none;">
         <div class="privacy-modal">
@@ -236,7 +250,7 @@
     </div>
 
     <script>
-        // 200句完整名言
+        // 完整200句名言
         const quoteLibrary = [
             { text: "学而时习之，不亦说乎。", author: "孔子" },
             { text: "三人行，必有我师焉。择其善者而从之，其不善者而改之。", author: "孔子" },
