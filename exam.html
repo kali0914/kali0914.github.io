@@ -1,381 +1,410 @@
 
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title>登录</title>
-		<script src="../src/jquery-3.3.1.js"></script>
-		<link rel="stylesheet" href="../src/css/layui.css">
-		<link rel="stylesheet" href="../css/adminLogin.css">
-		<link rel="stylesheet" href="../css/screen.css">
-	</head>
-	<body style="background: url('../images/login_bg.png');position: absolute;width: 100%;height: 100%;margin: 0;padding: 0;">
-		<!-- <div class="wrap">
-        <img src="../images/login.jpg" class="imgStyle"> -->
-		<!-- <div class="bg"></div> -->
-		<div id="bannerTitle" style="width: 100%;">
-			<!-- <div style="background-image: url(../images/logo_W.png); width: 369px; height: 76px; margin: 0 auto;"></div> -->
-			<img src="../images/logo_W.png" style="position: relative;top: 50%; left: 50%;transform: translate(-50%,-50%);">
-		</div>
-		<div style="width: 100%; margin-top: 40px; height: 675px;">
-			<div class="loginFormss">
-				<div class="logoHeadss">
-					<span style="margin-top: 15px; color: #333333; font-size: 30px; font-weight: 800; font-family: PingFangSC-Semibold, sans-serif;">南昌市中招信息管理服务平台</span>
-				</div>
-				<div class="inputMainAdmin">
-					<div style="width:600px;margin:0 auto;">
-						<div class="usernameWrapDiv">
-							<div class="usernameLabel">
-								<label>手机号:</label>
-							</div>
-						</div>
-						<div class="usernameDiv">
-							<input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入手机号">
-						</div>
-						<hr style="width: 500px; margin-left: 50px;">
-						<!--<div class="usernameWrapDiv">
-							<div class="usernameLabel">
-								<label>密码:</label>
-							</div>
-							<div class="passwordDiv">
-								<i class="layui-icon layui-icon-password adminIcon"></i>
-								<input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
-							</div>
-						</div>-->
-						<div class="usernameWrapDiv codeInputMain2">
-							<div class="usernameLabel">
-								<label>验证码:</label>
-							</div>
-						</div>
-						<div>
-							<div class="cardDivAdmin">
-								<input id="imgCard" class="layui-input cardInput" type="text" name="card" placeholder="输入验证码">
-							</div>
-							<div class="codeDivAdmin">
-								<img src="" class="codeInput" id="imgCode">
-								<input id="imgCode" class="layui-input codeInput"  type="button">
-							</div>
-							<br/>
-							<div class="layui-inline" id="LoginAccountChangeCard" style="cursor:pointer;vertical-align: bottom;">
-								<span style="color: #7b7b7b;">看不清？换一张</span>
-							</div>
-						</div>
-						<hr style="width: 500px; margin-left: 50px;">
-						<div class="usernameWrapDiv smsInput">
-							<div class="usernameLabel">
-								<label>短信码:</label>
-							</div>
-						</div>
-						<div>
-							<div class="cardDivAdmin">
-								<input id="loginCard" class="layui-input cardInput" type="text" name="card" placeholder="输入短信码">
-							</div>
-							<div class="smsDiv">
-								<input id="loginCode" class="layui-btn layui-btn-primary smsColor" type="button" value="获取短信码">
-							</div>
-						</div>
-						<hr style="width: 500px; margin-left: 50px;">
-						<div style="width: 600px; margin-left: 45px;">
-							<div class="submitLabelss" style="visibility: hidden;">
-								<label>没有账号？<a href="#" id="loginRegister">点击注册</a></label>
-							</div>
-							<div>
-								<input id="loginBtn" type="button" class="submit layui-btn layui-btn-primary" value="登录"></input>
-								<br /><br />
-								<input id="activeAccount" type="button" class="submit layui-btn layui-btn-primary" value="激活" style="background-color: #409EFF;"></input>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="footerss" style="width: 100%;  bottom: 0px; position: fixed; color: #666666; text-align: center;">
-			<!-- <div style="background-image: url(../images/logo_W.png); width: 369px; height: 76px; margin: 0 auto;"></div> -->
-			<!-- <img src="../images/logo_W.png" style="position: relative;width: 369px; height: 76px;top: 50%; left: 50%;transform: translate(-50%,-50%);"> -->
-			<span>©️2020 - 南昌市教育考试院</span>
-		</div>
-		<script src="../src/layui.js" type="text/javascript"></script>
-		<script src="../common/browser.js"></script>
-		<script src="../common/config.js"></script>
-		<!-- <script src="../js/adminlogin.js" type="text/javascript"></script> -->
-		<script type="text/javascript">
-			loadJs(["../js/adminlogin.js"])
-			layui.config({
-				base: '../src/layui_exts/'
-			}).extend({
-				excel: 'excel'
-			});
-		</script>
-	</body>
-	<div class="registerPage">
-		<div class="registerDiv">
-			<form>
-				<div class="usernameWrapDiv">
-					<div class="usernameLabel">
-						<label>用户名:</label>
-					</div>
-					<div class="usernameDiv">
-						<i class="layui-icon layui-icon-username adminIcon"></i>
-						<input id="registerUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名">
-					</div>
-				</div>
-				<div class="usernameWrapDiv">
-					<div class="usernameLabel">
-						<label>密码:</label>
-					</div>
-					<div class="passwordDiv">
-						<i class="layui-icon layui-icon-password adminIcon"></i>
-						<input id="registerPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
-					</div>
-				</div>
-				<div class="usernameWrapDiv">
-					<div class="usernameLabel">
-						<label>确认密码:</label>
-					</div>
-					<div class="passwordDiv">
-						<i class="layui-icon layui-icon-password adminIcon"></i>
-						<input id="registerWellPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
-					</div>
-				</div>
-				<div class="usernameWrapDiv">
-					<div class="usernameLabel">
-						<label>角色类型:</label>
-					</div>
-					<div class="passwordDiv">
-						<select id="roleSelect" class="layui-select">
-							<option value="">请选择...</option>
-							<option value="0">管理员</option>
-							<option value="1">学生</option>
-						</select>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <script src="../src/jquery-3.3.1.js"></script>
+    <script src="../src/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="../src/css/layui.css">
+    <link rel="stylesheet" href="../css/adminLogin.css">
+    <link rel="stylesheet" href="../css/screen.css">
 
-	<!-- 激活学校账号 -->
-	<div class="activeSchoolAccount addDiv"  style="display: none;">
-		<!-- <form class="layui-form" action=""> -->
-		 <div style="margin-top: 10px;padding: 0px 11%;" id="">
-			 
-			 <div class="layui-form-item" style="height: 40px;">
-			 	<div class="layui-inline">
-			 		<label class="layui-form-label">选择类型</label>
-					<div class="layui-input-inline inputWidth" id="RadioSelect">
-						&nbsp;&nbsp;
-						<input type="radio" name="FromType" value="0" title="初中学校">&nbsp;&nbsp;初中学校
-						&nbsp;&nbsp;
-						<input type="radio" name="FromType" value="2" title="高中学校">&nbsp;&nbsp;高中学校
-						&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="radio" name="FromType" value="1" title="区县">&nbsp;&nbsp;区县
-					</div>
-			 	</div>
-			 </div>
-			 <hr style="width: 500px; margin-left: 50px;">
-			<div class="layui-form-item">
-				<div class="layui-inline">
-					<label class="layui-form-label">手机号</label>
-					<div class="layui-input-inline inputWidth">
-						<input id="activePhoneNum" type="tel" name="phone" lay-verify="required|phone" placeholder="请输入手机号" autocomplete="off"
-						 class="layui-input">
-					</div>
-				</div>
-			</div>
-<hr style="width: 500px; margin-left: 50px;">
-			<div class="layui-form-item">
-				 <div class="layui-inline">
-				<label class="layui-form-label">用户名</label>
-				<div class="layui-input-block">
-					<input id="activeUserName" type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入用户名"
-					 class="layui-input">
-				</div>
-				</div>
-			</div>
-<hr style="width: 500px; margin-left: 50px;">
+    <script src="../src/layui.js" type="text/javascript"></script>
+    <script src="../common/browser.js"></script>
+    <script src="../common/config.js"></script>
+    <!-- <script src="../js/login.js" type="text/javascript"></script> -->
+    <script type="text/javascript">
+        loadJs(["../js/login.js"])
+        layui.config({
+            base: '../src/layui_exts/'
+        }).extend({
+            excel: 'excel'
+        });
+    </script>
+    <style>
+   .icon-css-view {
+    position: absolute;
+    top: 11px;
+    right: -33px;
+    text-align: center;
+}
+.usernameLabel {
+    width: 200px !important;
+}
+    </style>
+</head>
+<!-- width: 100%;height: 100%; -->
+<!--background: url('../images/login_bg.png');-->
+<body id="loginScreen" style="background: #87CEFA;position: absolute; margin: 0; padding: 0;">
+    <!-- <div class="wrap">
+        <img src="../images/login.jpg" class="imgStyle">
+        <div class="loginForm">
+            <form>
+                <div class="logoHead">
+                    <h2 style="margin-top: 15px">南昌市教育平台管理系统</h2>
+                </div>
+                <div id="accountLogin">
+                    <div class="usernameWrapDiv">
+                        <div class="usernameLabel">
+                            <label>用户名:</label>
+                        </div>
+                        <div class="usernameDiv">
+                            <i class="layui-icon layui-icon-username adminIcon"></i>
+                            <input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名" >
+                        </div>
+                    </div>
+                    <div class="usernameWrapDiv">
+                        <div class="usernameLabel">
+                            <label>密码:</label>
+                        </div>
+                        <div class="passwordDiv">
+                            <i class="layui-icon layui-icon-password adminIcon"></i>
+                            <input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                        </div>
+                    </div>
+                    <div class="usernameWrapDiv">
+                        <div class="usernameLabel">
+                            <label>验证码:</label>
+                        </div>
+                        <div class="cardDiv">
+                            <input id="imgCard" class="layui-input cardInput" type="text" name="card" placeholder="输入验证码">
+                        </div>
+                        <div class="codeDiv">
+                            <img src="" class="codeInput" id="imgCode">
+                        </div>
+                    </div>
+                    <div class="usernameWrapDiv">
+                        <div class="submitLabel">
+                            <label><a href="#" class="mobileLogin" id="mobileLogin">短信快捷登录</a></label>
+                        </div>
+                        <div class="submitDiv">
+                            <input id="loginBtn" type="button" class="submit layui-btn layui-btn-primary" value="登录"></input>
+                        </div>
+                    </div>
+                </div>
+                <div id="smsLogin" class="dn">
+                    <div class="usernameWrapDiv">
+                        <div class="usernameLabel">
+                            <label>手机号:</label>
+                        </div>
+                        <div class="usernameDiv">
+                            <i class="layui-icon layui-icon-username adminIcon"></i>
+                            <input id="loginPhoneNumber" class="layui-input adminInput" type="text" name="username" placeholder="输入手机号" >
+                        </div>
+                    </div>
+                    <div class="usernameWrapDiv">
+                        <div class="usernameLabel">
+                            <label>验证码:</label>
+                        </div>
+                        <div class="cardDiv">
+                            <input id="captcha" class="layui-input cardInput" type="text" name="card" placeholder="输入验证码">
+                        </div>
+                        <div class="codeDiv">
+                            <img src="" class="codeInput" id="captchaImage">
+                        </div>
+                    </div>
+                    <div class="usernameWrapDiv">
+                        <div class="usernameLabel">
+                            <label>短信码:</label>
+                        </div>
+                        <div class="cardDiv">
+                            <input id="smsCode" class="layui-input cardInput" type="text" name="card" placeholder="输入短信码">
+                        </div>
+                        <div class="codeDiv">
+                            <input id="smsButton" class="submit layui-btn layui-btn-primary"  type="button" value="获取短信码">
+                        </div>
+                    </div>
+                    <div class="usernameWrapDiv">
+                        <div class="submitLabel">
+                            <label><a class="mobileLogin" id="accountLogin2">账号密码登录</a></label>
+                        </div>
+                        <div class="submitDiv">
+                            <input id="loginButton" type="button" class="submit layui-btn layui-btn-primary" value="登录"></input>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div> -->
+    <!--background-color: #ffffff;-->
+    <div id="bannerTitle" style=" width: 100%;">
+        <!-- <div style="background-image: url(../images/logo_W.png); width: 369px; height: 76px; margin: 0 auto;"></div> -->
+        <!--<img src="../images/logo_W.png" style="position: relative;top: 50%; left: 50%;transform: translate(-50%,-50%);">-->
+        <h1 style="padding-top: 5%; text-align: center; font-weight: bolder; font-size: 36px; font-family: PingFangSC-Semibold, sans-serif;">南昌市教育考试院</h1>
+    </div>
+    <div style="width: 100%; margin-top: 5%;">
+        <div class="loginFormss">
+            <div class="logoHeadss">
+                <span style="margin-top: 15px; color: #333333; font-size: 30px; font-weight: 800; font-family: PingFangSC-Semibold, sans-serif;">南昌市中招信息管理服务平台</span>
+            </div>
+            <div class="logoHeadEngss">
+                <!-- <span style="color: #575857; font-size: 20px; font-weight: 500; font-family: Helvetica;">EDUCATION EXAMINATIONS AUTHORITY</span> -->
+            </div>
+            <div id="accountLogin" class="inputMain">
+                <div class="usernameWrapDiv">
+                    <div class="usernameLabel">
+                        <label>账号(报名序号)：</label>
+                    </div>
+                </div>
+                <div class="usernameDiv">
+                    <!-- <i class="layui-icon layui-icon-username adminIcon"></i> -->
+                    <input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="请输入报名序号">
+                </div>
+                <hr style="width: 500px; margin-left: 50px;">
+                <div class="usernameWrapDiv">
+                    <div class="usernameLabel passwordInput">
+                        <label>密码：</label>
+                    </div>
 
-			<div class="layui-form-item">
-				<label class="layui-form-label">代码</label>
-				<div class="layui-input-block">
-					<input id="activeSchoolCode" type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入学校代码"
-					 class="layui-input">
-				</div>
-			</div>
-			
-<hr style="width: 500px; margin-left: 50px;">
+                    <div class="passwordPrompt" style="display: none">
+                        <span>首次登录密码为身份证后8位，登录后务必修改密码</span>
+                    </div>
+                </div>
+                <div class="passwordDiv">
+                    <!-- <i class="layui-icon layui-icon-password adminIcon"></i> -->
+                    <input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="请输入密码">
+                </div>
+                <hr style="width: 500px; margin-left: 50px;">
+                <div class="usernameWrapDiv codeInputMain">
+                    <div class="usernameLabel">
+                        <label>验证码:</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="cardDiv">
+                        <input id="imgCard" class="layui-input cardInput" type="text" name="card" placeholder="请输入验证码">
+                    </div>
+                    <div class="codeDiv">
+                        <img src="" class="codeInput" id="imgCode">
+                    </div>
+                    <div class="codeDiv1">
+                        <span style="color: #7b7b7b;">看不清？换一张</span>
+                    </div>
+                </div>
+                <hr style="width: 500px; margin-left: 50px;">
+                <div class="usernameWrapDiv">
+                    <div class="submitLabelss">
+                        <!-- <label><a href="#" class="mobileLogin" id="mobileLogin">短信快捷登录</a></label> -->
+                    </div>
+                </div>
+                <div class="submitDivss">
+                    <input id="loginBtn" type="button" class="submit layui-btn layui-btn-primary" value="登录"></input>
+                </div>
+                <div class="submitDivss2">
+                    <input id="loginBtn2" type="button" class="submit2 layui-btn layui-btn-primary" value="江西省统一身份认证"></input>
+                </div>
+            </div>
+            <div id="smsLogin" class="dn inputMain">
+                <div class="usernameWrapDiv">
+                    <div class="usernameLabel">
+                        <label>手机号:</label>
+                    </div>
 
-			<div class="layui-form-item">
-				<label class="layui-form-label">激活密码</label>
-				<div class="layui-input-block">
-					<input id="activePassword" type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入密码"
-					 class="layui-input">
-				</div>
-			</div>
+                </div>
+                <div class="usernameDiv">
+                    <!-- <i class="layui-icon layui-icon-username adminIcon"></i> -->
+                    <input id="loginPhoneNumber" class="layui-input adminInput" type="text" name="username" placeholder="输入手机号">
+                </div>
+                <hr style="width: 500px; margin-left: 50px;">
+                <div class="usernameWrapDiv codeInputMain2">
+                    <div class="usernameLabel">
+                        <label>验证码:</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="cardDiv">
+                        <input id="captcha" class="layui-input cardInput" type="text" name="card" placeholder="输入验证码">
+                    </div>
+                    <div class="codeDiv">
+                        <img src="" class="codeInput" id="captchaImage">
+                    </div>
+                </div>
+                <hr style="width: 500px; margin-left: 50px;">
+                <div class="usernameWrapDiv smsInput">
+                    <div class="usernameLabel">
+                        <label>短信码:</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="cardDiv">
+                        <input id="smsCode" class="layui-input cardInput" type="text" name="card" placeholder="输入短信码">
+                    </div>
+                    <div class="smsDiv">
+                        <input id="smsButton" class="layui-btn layui-btn-primary smsColor" type="button" value="获取短信码">
+                    </div>
+                </div>
+                <hr style="width: 500px; margin-left: 50px;">
+                <div class="usernameWrapDiv">
+                    <div class="submitLabel">
+                        <label><a class="mobileLogin" id="accountLogin2">账号密码登录</a></label>
+                    </div>
+                </div>
+                <div class="submitDiv">
+                    <input id="loginButton" type="button" class="submit layui-btn layui-btn-primary" value="登录"></input>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<hr style="width: 500px; margin-left: 50px;">
+    <!--background-color: #ffffff;-->
+    <div id="footerss" style="width: 100%; position: fixed; color: #666666;text-align: center; bottom: 0;">
+        <!-- <div style="background-image: url(../images/logo_W.png); width: 369px; height: 76px; margin: 0 auto;"></div> -->
+        <!-- <img src="../images/logo_W.png" style="position: relative;width: 369px; height: 76px;top: 50%; left: 50%;transform: translate(-50%,-50%);"> -->
+        <div style="display: flex; align-items: center; flex-direction: column;justify-content: center; flex-flow: column;">
+            <div>登录页推荐使用浏览器（360、QQ、搜狗、edge、chrome）</div>
+            <div>©️2023 - 南昌市教育考试院</div>
+        </div>
+    </div>
 
-			<div class="layui-form-item">
-				<label class="layui-form-label">验证码</label>
-				 <div class="layui-inline" style="width: 180px;">
-					<input  id="activeImgCard" class="layui-input cardInput" type="text" name="card" placeholder="输入验证码">
-				</div>
-				 <div class="layui-inline" style="width: 100px;">
-					<img  src="" class="codeInput" id="activeImgCode">
-					<br/><br/>
-				</div>
-				 <div class="layui-inline" id="activeAccountChangeCard" style="cursor:pointer;vertical-align: bottom;">
-					  <span style="color: #7b7b7b;">看不清？换一张</span>
-					 </div>
-			</div>
-<hr style="width: 500px; margin-left: 50px;">
+</body>
+<div class="registerPage">
+    <div class="registerDiv">
+        <form>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>用户名:</label>
+                </div>
+                <div class="usernameDiv">
+                    <i class="layui-icon layui-icon-username adminIcon"></i>
+                    <input id="registerUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名">
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>密码:</label>
+                </div>
+                <div class="passwordDiv">
+                    <i class="layui-icon layui-icon-password adminIcon"></i>
+                    <input id="registerPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>确认密码:</label>
+                </div>
+                <div class="passwordDiv">
+                    <i class="layui-icon layui-icon-password adminIcon"></i>
+                    <input id="registerWellPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                </div>
+            </div>
+            <div class="usernameWrapDiv">
+                <div class="usernameLabel">
+                    <label>角色类型:</label>
+                </div>
+                <div class="passwordDiv">
+                    <select id="roleSelect" class="layui-select">
+                        <option value="">请选择...</option>
+                        <option value="0">管理员</option>
+                        <option value="1">学生</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
-			<div class="layui-form-item">
-				<label class="layui-form-label">短信验证码</label>
-				 <div class="layui-inline" style="width: 180px;">
-					<input id="activeSms" class="layui-input cardInput" type="text" name="card" placeholder="输入短信码">
-				</div>
-				 <div class="layui-inline">
-					<input id="activeAccountSms" class="layui-btn layui-btn-primary smsColor" type="button" value="获取短信码">
-				</div>
-			</div>
+<!--修改密码-->
+<div class="changePasswordPage" style="display: none;">
+    <div class="addDiv">
+        <div class="layui-form add-from-margin" id="">
 
-<hr style="width: 500px; margin-left: 50px;">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">原密码</label>
+                    <div class="layui-input-inline inputWidth layui-input-style">
+                        <input type="password" name="email" id="oldPassword" lay-verify="email" autocomplete="off" class="layui-input" placeholder="输入原密码">
+                        <div class="icon-css-view">
+                            <!-- <i id="iconShowView" class="layui-icon layui-icon-face-smile" style="color: lawngreen;"></i>
+                            <i id="iconHiddenView" class="layui-icon layui-icon-face-cry" style="color: orangered;" hidden></i> -->
+                            <span id="iconShowView" style="color: lawngreen;">查看</span>
+                            <span id="iconHiddenView" style="color: orangered;" hidden>隐藏</span>
+                        </div>    
+                    </div>
+                </div>
+            </div>
+            <hr style="width: 500px; margin-left: 50px;">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">新密码</label>
+                    <div class="layui-input-inline inputWidth">
+                        <input type="password" name="email" id="newPassword" lay-verify="email" autocomplete="off" class="layui-input" placeholder="输入新密码">
+                        <div class="icon-css-view">
+                            <!-- <i id="iconShowView2" class="layui-icon layui-icon-face-smile" style="color: lawngreen;"></i>
+                            <i id="iconHiddenView2" class="layui-icon layui-icon-face-cry" style="color: orangered;" hidden></i> -->
+                            <span id="iconShowView2" style="color: lawngreen;">查看</span>
+                            <span id="iconHiddenView2" style="color: orangered;" hidden>隐藏</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr style="width: 500px; margin-left: 50px;">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">确认密码</label>
+                    <div class="layui-input-inline inputWidth">
+                        <input type="password" name="email" id="confirmPassword" lay-verify="email" autocomplete="off" class="layui-input" placeholder="输入新密码">
+                        <div class="icon-css-view">
+                            <!-- <i id="iconShowView3" class="layui-icon layui-icon-face-smile" style="color: lawngreen;"></i>
+                            <i id="iconHiddenView3" class="layui-icon layui-icon-face-cry" style="color: orangered;" hidden></i> -->
+                            <span id="iconShowView3" style="color: lawngreen;">查看</span>
+                            <span id="iconHiddenView3" style="color: orangered;" hidden>隐藏</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr style="width: 500px; margin-left: 50px;">
+        </div>
+    </div>
+</div>
 
-			<div style="padding-top: 15px;text-align: center;">
-				<input style="width: 280px;" id="activeAccountBtn" type="button" class="submit layui-btn layui-btn-primary" value="提交激活" style="background-color: #009688;"></input>
-			</div>
-		<!-- </form> -->
-		</div>
-	</div>
-	
-	<!--联系方式填写-->
-	<div class="contactWritePage" style="display: none;">
-	    <div class="layui-form add-from-contactWrite" id="">
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">校长/局长：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="XzOrJz" autocomplete="off" placeholder="请输入校长/局长" class="layui-input">
-	                    <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-	
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">校长/局长手机：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="XzOrJzPhoneNums" autocomplete="off" placeholder="请输入校长/局长电话"
-	                        class="layui-input">
-	                        <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-	
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">分管校长/局长：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="FgXzOrJzss" autocomplete="off" placeholder="请输入分管校长/局长" class="layui-input">
-	                    <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-	
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">分管校长/局长手机：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="FgXzOrJzPhoneNums" autocomplete="off" placeholder="请输入分管校长/局长电话"
-	                        class="layui-input">
-	                        <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-	
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">分管主任/部门负责人：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="fgZrOrBmfzrs" autocomplete="off" placeholder="请输入分管主任/部门负责人"
-	                        class="layui-input">
-	                        <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-	
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">分管主任/部门负责人手机：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="fgZrOrBmfzrPhoneNumss" autocomplete="off" placeholder="请输入分管主任/部门负责人电话"
-	                        class="layui-input">
-	                        <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-	
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">系统管理员姓名：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="XtGly" autocomplete="off" placeholder="请输入系统管理员姓名" class="layui-input">
-	                    <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-	
-	        <div class="layui-form-item">
-	            <div class="layui-inline">
-	                <label class="layui-form-label label-name">系统管理员手机：</label>
-	                <div class="layui-input-inline">
-	                    <input type="text" style="width: 300px;" id="XtGlyPhoneNum" autocomplete="off" placeholder="请输入系统管理员电话"
-	                        class="layui-input">
-	                        <br>
-	                    <hr style="width: 300px; margin-top: -20px;">
-	                </div>
-	            </div>
-	        </div>
-			
-			<div class="layui-form-item">
-			    <div class="layui-inline">
-			        <label class="layui-form-label label-name">专干姓名：</label>
-			        <div class="layui-input-inline">
-			            <input type="text" style="width: 300px;" id="XxgsyOrGs" autocomplete="off" placeholder="请输入专干姓名"
-			                class="layui-input">
-			                <br>
-			            <hr style="width: 300px; margin-top: -20px;">
-			        </div>
-			    </div>
-			</div>
-			
-			<div class="layui-form-item">
-			    <div class="layui-inline">
-			        <label class="layui-form-label label-name">专干手机：</label>
-			        <div class="layui-input-inline">
-			            <input type="text" style="width: 300px;" id="XxgsyOrGsPhoneNum" autocomplete="off" placeholder="请输入专干姓电话"
-			                class="layui-input">
-			                <br>
-			            <hr style="width: 300px; margin-top: -20px;">
-			        </div>
-			    </div>
-			</div>
-			
-	    </div>
-	</div>
-	
-	
+<!--绑定手机-->
+<div class="bindPhone" style="display: none;">
+    <!-- <div class="loginForm"> -->
+    <form style="margin-top: 20px;">
+        <div class="usernameWrapDivBd">
+            <div class="usernameLabel">
+                <label>手机号</label>
+            </div>
 
+        </div>
+        <div class="usernameDivBd">
+            <!-- <i class="layui-icon layui-icon-username adminIcon"></i> -->
+            <input id="bindPhoneNumber" class="layui-input adminInputBd" type="text" name="username" placeholder="输入手机号">
+        </div>
+        <hr style="width: 300px; margin-left: 50px;">
+        <div class="usernameWrapDivBd">
+            <div class="usernameLabel">
+                <label>验证码</label>
+            </div>
+
+        </div>
+        <div>
+            <div class="cardDivBd">
+                <input id="bindCaptcha" class="layui-input cardInputBd" type="text" name="card" placeholder="输入验证码">
+            </div>
+            <div class="codeDiv">
+                <img src="" class="codeInput" id="bindCaptchaImage">
+                <!--<input id="imgCode" class="layui-input codeInput"  type="button">-->
+            </div>
+        </div>
+        <hr style="width: 300px; margin-left: 50px;">
+        <div class="usernameWrapDivBd">
+            <div class="usernameLabel">
+                <label>短信码</label>
+            </div>
+
+        </div>
+        <div>
+            <div class="cardDivBd">
+                <input id="bindSmsCode" class="layui-input cardInputBd" type="text" name="card" placeholder="输入短信码">
+            </div>
+            <div class="smsDiv">
+                <input id="bindsmsButton" class="layui-btn layui-btn-primary smsColor" type="button" value="获取短信码">
+            </div>
+        </div>
+        <hr style="width: 300px; margin-left: 50px;">
+    </form>
+    <!-- </div> -->
+</div>
 </html>
-<style type="text/css">
-.layui-form-item {
-    margin-bottom: 0px;
-    clear: both;
-}	
-</style>	
