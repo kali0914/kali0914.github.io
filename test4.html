@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高德天气 API 测试</title>
+    <style>
+        :root {
+            --blue: #3498db; --green: #2ecc71; --red: #e74c3c;
+            --dark-bg: #0a0e17; --card-bg: #131926;
+            --border: rgba(52,152,219,0.2); --text: #c0c0c0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+        body {
+            background: var(--dark-bg);
+            color: var(--text); min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+            background-image: radial-gradient(circle at 20% 20%, rgba(52,152,219,0.04) 0%, transparent 50%);
+        }
+        .container { max-width: 700px; width: 100%; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 1.8rem; color: #fff; }
+        .header h1 i { color: var(--blue); }
+        .header p { color: #666; font-size: 0.85rem; margin-top: 6px; }
+
+        .alert {
+            background: rgba(231,76,60,0.12); border: 1px solid rgba(231,76,60,0.3);
+            border-radius: 10px; padding: 14px 18px; margin-bottom: 18px;
+            font-size: 0.85rem; color: #ff9080; display: none;
+        }
+        .alert.show { display: block; }
+        .alert.success {
+            background: rgba(46,204,113,0.1); border-color: rgba(46,204,113,0.3); color: #b7f0c2;
+        }
+
+        .test-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px; margin-bottom: 16px;
+        }
+        .test-card h3 { font-size: 1.1rem; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .test-card h3 i { color: var(--blue); }
+        .test-card p { color: #888; font-size: 0.8rem; margin-bottom: 14px; }
+
+        .input-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .input-row input {
+            flex:1; min-width: 160px; padding: 10px 14px; border-radius: 8px;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12);
+            color: #fff; outline: none; font-size: 0.9rem;
+        }
+        .input-row input:focus { border-color: var(--blue); }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 20px; border-radius: 8px; font-weight: 600;
+            font-size: 0.9rem; cursor: pointer; border: none; transition: 0.2s;
+        }
+        .btn-primary { background: var(--blue); color: #fff; }
+        .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.06); color: #ccc; border: 1px solid rgba(255,255,255,0.12); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        .quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .quick-btns .btn { padding: 6px 16px; font-size: 0.8rem; }
+
+        .result-box {
+            background: rgba(0,0,0,0.3); border-radius: 10px; padding: 16px;
+            margin-top: 14px; border: 1px solid rgba(255,255,255,0.06); display: none;
+        }
+        .result-box.show { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        .weather-main { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
+        .weather-icon { font-size: 3rem; }
+        .weather-temp { font-size: 2.5rem; font-weight: 700; color: #fff; }
+        .weather-city { color: #aaa; font-size: 1rem; }
+
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; }
+        .detail-item { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; text-align: center; }
+        .detail-item .label { font-size: 0.7rem; color: #777; }
+        .detail-item .value { font-size: 1rem; font-weight: 600; color: #fff; margin-top: 2px; }
+
+        .ip-info { display: flex; flex-wrap: wrap; gap: 12px; }
+        .ip-info span { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; }
+        .ip-info .label { color: #777; margin-right: 6px; }
+        .ip-info .value { color: #fff; font-weight: 500; }
+
+        .log-area {
+            background: rgba(0,0,0,0.4); border-radius: 8px; padding: 12px;
+            font-family: 'SF Mono','Consolas',monospace; font-size: 0.78rem;
+            color: #aaa; margin-top: 12px; max-height: 180px; overflow-y: auto;
+            border-left: 3px solid var(--blue); display: none;
+        }
+        .log-area.show { display: block; }
+        .log-area .line { margin-bottom: 3px; }
+        .log-area .line.success { color: #2ecc71; }
+        .log-area .line.error { color: #e74c3c; }
+
+        .footer-note {
+            text-align: center; font-size: 0.75rem; color: #555; margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-cloud-sun"></i> 高德天气 API 测试</h1>
+        <p>Key: 0132157a873ec7d07ec9ca0c2cd6a608</p>
+    </div>
+
+    <!-- 警告区域 -->
+    <div class="alert" id="alertBox"></div>
+
+    <!-- IP 定位 -->
+    <div class="test-card">
+        <h3><i class="fas fa-map-marker-alt"></i> IP 定位</h3>
+        <p>自动获取当前 IP 的归属地</p>
+        <button class="btn btn-primary" id="btnIpTest">📡 开始定位</button>
+        <div class="result-box" id="ipResult">
+            <div class="ip-info" id="ipInfo"></div>
+        </div>
+    </div>
+
+    <!-- 天气查询 -->
+    <div class="test-card">
+        <h3><i class="fas fa-cloud-sun-rain"></i> 实时天气</h3>
+        <p>输入城市名查询当前天气</p>
+        <div class="input-row">
+            <input type="text" id="cityInput" placeholder="例如：南昌" value="南昌">
+            <button class="btn btn-primary" id="btnWeather">🔍 查询</button>
+        </div>
+        <div class="quick-btns" id="quickBtns">
+            <button class="btn btn-secondary" data-city="北京">北京</button>
+            <button class="btn btn-secondary" data-city="上海">上海</button>
+            <button class="btn btn-secondary" data-city="广州">广州</button>
+            <button class="btn btn-secondary" data-city="深圳">深圳</button>
+            <button class="btn btn-secondary" data-city="南昌">南昌</button>
+        </div>
+        <div class="result-box" id="weatherResult">
+            <div class="weather-main" id="weatherMain"></div>
+            <div class="detail-grid" id="weatherDetails"></div>
+        </div>
+    </div>
+
+    <!-- 日志 -->
+    <div class="log-area" id="logArea"></div>
+
+    <div class="footer-note">
+        ⚠️ 请使用 <strong>http:// 或 https://</strong> 方式访问本页面，勿直接双击文件打开。
+    </div>
+</div>
+
+<script>
+    (function() {
+        const AMAP_KEY = '0132157a873ec7d07ec9ca0c2cd6a608';
+
+        // DOM 元素
+        const alertBox = document.getElementById('alertBox');
+        const btnIp = document.getElementById('btnIpTest');
+        const btnWeather = document.getElementById('btnWeather');
+        const cityInput = document.getElementById('cityInput');
+        const ipResult = document.getElementById('ipResult');
+        const ipInfo = document.getElementById('ipInfo');
+        const weatherResult = document.getElementById('weatherResult');
+        const weatherMain = document.getElementById('weatherMain');
+        const weatherDetails = document.getElementById('weatherDetails');
+        const logArea = document.getElementById('logArea');
+
+        // 显示警告
+        function showAlert(msg, type = 'error') {
+            alertBox.textContent = msg;
+            alertBox.className = 'alert show ' + (type === 'success' ? 'success' : '');
+        }
+
+        // 日志
+        function log(msg, type = 'info') {
+            logArea.classList.add('show');
+            const div = document.createElement('div');
+            div.className = 'line ' + type;
+            const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+            div.textContent = `[${time}] ${msg}`;
+            logArea.appendChild(div);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        function clearLog() { logArea.innerHTML = ''; logArea.classList.remove('show'); }
+
+        // 天气图标映射
+        function getWeatherIcon(weather) {
+            const w = (weather || '').replace(/\s/g, '');
+            if (w.includes('晴')) return { icon: '☀️', cls: '' };
+            if (w.includes('多云')) return { icon: '⛅', cls: '' };
+            if (w.includes('阴')) return { icon: '☁️', cls: '' };
+            if (w.includes('雨')) return { icon: '🌧️', cls: '' };
+            if (w.includes('雪')) return { icon: '❄️', cls: '' };
+            return { icon: '🌤️', cls: '' };
+        }
+
+        // 检查页面协议
+        if (window.location.protocol === 'file:') {
+            showAlert('⚠️ 当前通过 file:// 协议打开，无法发送网络请求。请使用本地服务器（如 Live Server）或上传到 GitHub Pages 后再测试。', 'error');
+        }
+
+        // ========== IP 定位 ==========
+        btnIp.addEventListener('click', async () => {
+            btnIp.disabled = true;
+            btnIp.textContent = '⏳ 查询中...';
+            clearLog();
+            log('发起 IP 定位请求...');
+            try {
+                const resp = await fetch(`https://restapi.amap.com/v3/ip?key=${AMAP_KEY}`);
+                if (!resp.ok) {
+                    log(`HTTP ${resp.status}`, 'error');
+                    showAlert(`请求失败 (${resp.status})，请检查 Key 或网络`, 'error');
+                    btnIp.disabled = false;
+                    btnIp.textContent = '📡 开始定位';
+                    return;
+                }
+                const data = await resp.json();
+                log('收到响应: ' + JSON.stringify(data).substring(0, 200) + '...');
+                if (data.status === '1' && data.province) {
+                    const city = data.city || data.province;
+                    ipInfo.innerHTML = `
+                        <span><span class="label">省份</span><span class="value">${data.province}</span></span>
+                        <span><span class="label">城市</span><span class="value">${city}</span></span>
+                        <span><span class="label">编码</span><span class="value">${data.adcode || '—'}</span></span>
+                    `;
+                    ipResult.classList.add('show');
+                    showAlert('定位成功', 'success');
+                    log(`定位成功: ${city}`, 'success');
+                    // 自动填入城市
+                    if (data.city) cityInput.value = data.city;
+                } else {
+                    log('返回异常: ' + (data.info || '未知'), 'error');
+                    showAlert('定位失败，可能非中国 IP 或 Key 无效', 'error');
+                }
+            } catch (err) {
+                log('网络错误: ' + err.message, 'error');
+                showAlert('网络错误，请检查连接或浏览器是否拦截了请求', 'error');
+            }
+            btnIp.disabled = false;
+            btnIp.textContent = '📡 开始定位';
+        });
+
+        // ========== 天气查询 ==========
+        async function queryWeather(city) {
+            btnWeather.disabled = true;
+            btnWeather.textContent = '⏳ 查询中...';
+            clearLog();
+            log(`查询城市: ${city}`);
+            try {
+                const resp = await fetch(`https://restapi.amap.com/v3/weather/weatherInfo?key=${AMAP_KEY}&city=${encodeURIComponent(city)}&extensions=base`);
+                if (!resp.ok) {
+                    log(`HTTP ${resp.status}`, 'error');
+                    showAlert(`请求失败 (${resp.status})`, 'error');
+                    btnWeather.disabled = false;
+                    btnWeather.textContent = '🔍 查询';
+                    return;
+                }
+                const data = await resp.json();
+                log('收到响应: ' + JSON.stringify(data).substring(0, 200) + '...');
+                if (data.status === '1' && data.lives && data.lives.length > 0) {
+                    const w = data.lives[0];
+                    const iconInfo = getWeatherIcon(w.weather);
+                    weatherMain.innerHTML = `
+                        <span class="weather-icon">${iconInfo.icon}</span>
+                        <div>
+                            <div class="weather-temp">${w.temperature}°C</div>
+                            <div class="weather-city">📍 ${w.city} · ${w.weather}</div>
+                        </div>
+                    `;
+                    weatherDetails.innerHTML = `
+                        <div class="detail-item"><div class="label">温度</div><div class="value">${w.temperature}°C</div></div>
+                        <div class="detail-item"><div class="label">天气</div><div class="value">${w.weather}</div></div>
+                        <div class="detail-item"><div class="label">湿度</div><div class="value">${w.humidity || '—'}</div></div>
+                        <div class="detail-item"><div class="label">风向</div><div class="value">${w.winddirection || '—'} ${w.windpower || '—'}</div></div>
+                        <div class="detail-item"><div class="label">省份</div><div class="value">${w.province}</div></div>
+                        <div class="detail-item"><div class="label">报告时间</div><div class="value" style="font-size:0.8rem;">${w.reporttime || '—'}</div></div>
+                    `;
+                    weatherResult.classList.add('show');
+                    showAlert('天气查询成功', 'success');
+                    log(`成功: ${w.city} ${w.temperature}°C ${w.weather}`, 'success');
+                } else {
+                    log('返回异常: ' + (data.info || '未知'), 'error');
+                    showAlert('查询失败，请检查城市名或 Key', 'error');
+                }
+            } catch (err) {
+                log('网络错误: ' + err.message, 'error');
+                showAlert('网络错误，请检查连接', 'error');
+            }
+            btnWeather.disabled = false;
+            btnWeather.textContent = '🔍 查询';
+        }
+
+        btnWeather.addEventListener('click', () => {
+            const city = cityInput.value.trim();
+            if (!city) { showAlert('请输入城市名'); return; }
+            queryWeather(city);
+        });
+
+        // 快捷城市按钮
+        document.getElementById('quickBtns').addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' && e.target.dataset.city) {
+                cityInput.value = e.target.dataset.city;
+                queryWeather(e.target.dataset.city);
+            }
+        });
+
+        // 回车查询
+        cityInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnWeather.click();
+        });
+
+        // 页面加载完成
+        console.log('高德天气测试页面已就绪');
+        if (window.location.protocol !== 'file:') {
+            // 自动测试 IP 定位
+            setTimeout(() => btnIp.click(), 400);
+        }
+    })();
+</script>
+</body>
+</html>
