@@ -105,33 +105,34 @@
         .music-player-btn.playing { animation-play-state:running; border-color:var(--green); }
         @keyframes rotatePlayBtn { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
-        /* 声浪条：横贯屏幕底部，与按钮同一水平线 */
+        /* 声浪条：横贯屏幕底部，更透明更细 */
         .music-visualizer {
             position: fixed;
             bottom: 10px;
             left: 10px;
             right: 80px;
-            height: 60px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 1px;
             pointer-events: none;
             z-index: 998;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.02); /* 几乎完全透明 */
             border-radius: 30px;
             padding: 0 15px;
             overflow: hidden;
         }
         .music-visualizer .bar {
             flex: 1;
-            max-width: 6px;
-            min-width: 2px;
-            background: linear-gradient(to top, var(--blue), var(--green));
-            border-radius: 2px;
+            max-width: 2px;      /* 更细 */
+            min-width: 1px;
+            background: linear-gradient(to top, rgba(52, 152, 219, 0.7), rgba(46, 204, 113, 0.7));
+            border-radius: 1px;
             transition: height 0.08s linear;
-            min-height: 4px;
+            min-height: 2px;
             max-height: 100%;
+            opacity: 0.7;        /* 透明度 */
         }
 
         /* 资源下载样式 */
@@ -502,7 +503,7 @@
             system: { copyright: "阳光森林 © 2026 版权所有 V2.4" }
         };
 
-        // ==================== 音乐系统 ====================
+        // ==================== 音乐系统（优化加载速度） ====================
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicPlayerBtn');
         const visualizer = document.getElementById('musicVisualizer');
@@ -522,7 +523,7 @@
             for (let i = 0; i < barCount; i++) {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
-                bar.style.height = '4px';
+                bar.style.height = '3px'; // 更细
                 visualizer.appendChild(bar);
                 visualizerBars.push(bar);
             }
@@ -540,7 +541,7 @@
 
         function updateVisualizer() {
             if (!analyser || !isPlaying) {
-                visualizerBars.forEach(bar => bar.style.height = '4px');
+                visualizerBars.forEach(bar => bar.style.height = '3px');
                 return;
             }
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -548,21 +549,24 @@
             const step = Math.floor(dataArray.length / barCount);
             for (let i = 0; i < barCount; i++) {
                 const value = dataArray[i * step] || 0;
-                const height = (value / 255) * 50;
-                visualizerBars[i].style.height = Math.max(4, height) + 'px';
+                const height = (value / 255) * 40;
+                visualizerBars[i].style.height = Math.max(3, height) + 'px';
             }
             requestAnimationFrame(updateVisualizer);
         }
 
-        async function detectMusicFiles() {
+        // 并行检测音乐文件，大幅加快速度
+        async function detectMusicFilesFast() {
             const candidates = ['music1.MP3', 'music2.MP3', 'music3.MP3', 'music4.MP3', 'music5.MP3'];
+            const results = await Promise.allSettled(
+                candidates.map(name => fetch(name, { method: 'HEAD', cache: 'no-store' }))
+            );
             const available = [];
-            for (const name of candidates) {
-                try {
-                    const resp = await fetch(name, { method: 'HEAD' });
-                    if (resp.ok) available.push(name);
-                } catch (e) {}
-            }
+            results.forEach((result, index) => {
+                if (result.status === 'fulfilled' && result.value.ok) {
+                    available.push(candidates[index]);
+                }
+            });
             if (available.length === 0) available.push('music.MP3');
             return available;
         }
@@ -591,7 +595,10 @@
 
         musicBtn.addEventListener('click', async () => {
             if (!musicFiles.length) {
-                musicFiles = await detectMusicFiles();
+                // 显示加载状态
+                musicBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                musicFiles = await detectMusicFilesFast();
+                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
                 if (musicFiles.length > 0) playMusicAtIndex(0);
             } else {
                 if (isPlaying) {
