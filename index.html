@@ -105,6 +105,33 @@
         .music-player-btn.playing { animation-play-state:running; border-color:var(--green); }
         @keyframes rotatePlayBtn { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
+        /* 声浪条 */
+        .music-visualizer {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 70px;
+            height: 32px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 3px;
+            pointer-events: none;
+            z-index: 999;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 2px 4px;
+            box-sizing: content-box;
+        }
+        .music-visualizer .bar {
+            width: 3px;
+            background: linear-gradient(to top, var(--blue), var(--green));
+            border-radius: 2px;
+            transition: height 0.08s linear;
+            min-height: 4px;
+            max-height: 100%;
+        }
+
         /* 资源下载样式 */
         .resource-toolbar {
             display: flex;
@@ -113,9 +140,14 @@
             flex-wrap: wrap;
             margin-bottom: 15px;
         }
-        .resource-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:15px; margin-top:25px; }
+        .resource-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
         .resource-card { background:rgba(0,0,0,0.4); border-radius:12px; padding:15px; display:flex; align-items:center; gap:12px; transition:0.3s; border:1px solid transparent; }
-        .resource-card:hover { border-color:var(--green); transform:translateY(-3px); background:rgba(0,0,0,0.6); }
+        .resource-card:hover { border-color:var(--green); transform:translateY(-2px); background:rgba(0,0,0,0.6); }
         .resource-icon { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
         .resource-info { flex:1; min-width:0; }
         .resource-name { font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -133,7 +165,7 @@
         @media (max-width:768px) {
             .home-title { font-size:3rem; } .circular-action-btn { width:120px; height:120px; }
             .sticky-notes-grid { grid-template-columns:1fr; }
-            .resource-grid { grid-template-columns:1fr; }
+            .music-visualizer { bottom: 95px; right: 20px; width: 56px; }
         }
     </style>
 </head>
@@ -181,7 +213,8 @@
     </div>
 
     <div class="right-click-warning" id="rightClickWarning"><i class="fas fa-ban"></i><p>本站禁止使用右键</p></div>
-    <audio id="bgMusic" src="music.MP3" preload="auto" loop></audio>
+    <audio id="bgMusic" preload="auto" style="display:none;"></audio>
+    <div class="music-visualizer" id="musicVisualizer"></div>
     <div class="music-player-btn" id="musicPlayerBtn" title="播放/暂停音乐"><i class="fas fa-music"></i></div>
 
     <!-- 主页 -->
@@ -224,7 +257,7 @@
 
             <!-- 资源下载区域 -->
             <div class="resource-section" id="resourceSection">
-                <h2 class="section-title"><i class="fas fa-cloud-download-alt"></i> 资源下载</h2>
+                <h2 class="section-title">资源下载</h2>
                 <div class="resource-toolbar">
                     <button class="refresh-btn" id="backResourceBtn" title="返回上一级">
                         <i class="fas fa-arrow-left"></i> 上一级
@@ -238,9 +271,6 @@
                         <i class="fas fa-spinner fa-pulse"></i> 加载中...
                     </div>
                 </div>
-                <p style="color:#666; text-align:center; font-size:0.75rem; margin-top:15px;">
-                    数据来源：坚果云 WebDAV（website 文件夹）
-                </p>
             </div>
 
             <div class="security-tips-section" id="securityTipsSection"><h2 class="section-title">网络安全小贴士</h2><div class="security-tips-list" id="securityTipsListContainer"></div></div>
@@ -469,6 +499,113 @@
             system: { copyright: "阳光森林 © 2026 版权所有 V2.4" }
         };
 
+        // ==================== 音乐系统 ====================
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicPlayerBtn');
+        const visualizer = document.getElementById('musicVisualizer');
+
+        let audioCtx = null;
+        let analyser = null;
+        let source = null;
+        let musicFiles = [];
+        let currentMusicIndex = 0;
+        let isPlaying = false;
+        let visualizerBars = [];
+        const barCount = 20;
+
+        function createVisualizerBars() {
+            visualizer.innerHTML = '';
+            visualizerBars = [];
+            for (let i = 0; i < barCount; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = '4px';
+                visualizer.appendChild(bar);
+                visualizerBars.push(bar);
+            }
+        }
+
+        function initAudioContext() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+            source = audioCtx.createMediaElementSource(bgMusic);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+        }
+
+        function updateVisualizer() {
+            if (!analyser || !isPlaying) {
+                visualizerBars.forEach(bar => bar.style.height = '4px');
+                return;
+            }
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            const step = Math.floor(dataArray.length / barCount);
+            for (let i = 0; i < barCount; i++) {
+                const value = dataArray[i * step] || 0;
+                const height = (value / 255) * 30;
+                visualizerBars[i].style.height = Math.max(4, height) + 'px';
+            }
+            requestAnimationFrame(updateVisualizer);
+        }
+
+        async function detectMusicFiles() {
+            const candidates = ['music1.MP3', 'music2.MP3', 'music3.MP3', 'music4.MP3', 'music5.MP3'];
+            const available = [];
+            for (const name of candidates) {
+                try {
+                    const resp = await fetch(name, { method: 'HEAD' });
+                    if (resp.ok) available.push(name);
+                } catch (e) {}
+            }
+            if (available.length === 0) available.push('music.MP3');
+            return available;
+        }
+
+        function playMusicAtIndex(index) {
+            if (musicFiles.length === 0) return;
+            currentMusicIndex = index % musicFiles.length;
+            bgMusic.src = musicFiles[currentMusicIndex];
+            bgMusic.loop = false;
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                musicBtn.classList.add('playing');
+                initAudioContext();
+                updateVisualizer();
+            }).catch(() => {});
+        }
+
+        bgMusic.addEventListener('ended', () => {
+            if (musicFiles.length > 1) {
+                playMusicAtIndex(currentMusicIndex + 1);
+            } else {
+                bgMusic.currentTime = 0;
+                bgMusic.play();
+            }
+        });
+
+        musicBtn.addEventListener('click', async () => {
+            if (!musicFiles.length) {
+                musicFiles = await detectMusicFiles();
+                if (musicFiles.length > 0) playMusicAtIndex(0);
+            } else {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    isPlaying = false;
+                    musicBtn.classList.remove('playing');
+                } else {
+                    bgMusic.play().then(() => {
+                        isPlaying = true;
+                        musicBtn.classList.add('playing');
+                        initAudioContext();
+                        updateVisualizer();
+                    });
+                }
+            }
+        });
+
         // ==================== 坚果云资源下载 ====================
         const RESOURCE_WORKER_URL = 'https://apijgy.ygsl.us.ci/';
         const resourceGrid = document.getElementById('resourceGrid');
@@ -609,13 +746,21 @@
                     e.stopPropagation();
                     const path = decodeURIComponent(btn.dataset.path);
                     const originalHtml = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> 正在打包...';
                     btn.disabled = true;
                     try {
-                        const url = `${RESOURCE_WORKER_URL}?action=zip&path=${encodeURIComponent(path)}`;
-                        const resp = await fetch(url);
-                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                        const blob = await resp.blob();
+                        const listUrl = `${RESOURCE_WORKER_URL}?action=list&path=${encodeURIComponent(path)}`;
+                        const listResp = await fetch(listUrl);
+                        if (!listResp.ok) throw new Error('无法获取文件列表');
+                        const listXml = await listResp.text();
+                        const fileCount = countFiles(listXml);
+                        const estimatedSeconds = Math.max(3, Math.ceil(fileCount * 0.35) + 2);
+                        btn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> 打包中，预计 ${estimatedSeconds} 秒`;
+
+                        const zipUrl = `${RESOURCE_WORKER_URL}?action=zip&path=${encodeURIComponent(path)}`;
+                        const zipResp = await fetch(zipUrl);
+                        if (!zipResp.ok) throw new Error(`打包失败: HTTP ${zipResp.status}`);
+                        const blob = await zipResp.blob();
                         const a = document.createElement('a');
                         a.href = URL.createObjectURL(blob);
                         a.download = (path.split('/').pop() || 'folder') + '.zip';
@@ -632,6 +777,17 @@
             });
         }
 
+        function countFiles(xml) {
+            const doc = new DOMParser().parseFromString(xml, 'text/xml');
+            const responses = doc.getElementsByTagNameNS('DAV:', 'response');
+            let count = 0;
+            for (let r of responses) {
+                const isFolder = r.getElementsByTagNameNS('DAV:', 'collection').length > 0;
+                if (!isFolder) count++;
+            }
+            return count;
+        }
+
         backResourceBtn.addEventListener('click', () => {
             if (currentResourcePath === DEFAULT_FOLDER) return;
             const parentPath = getParentPath(currentResourcePath);
@@ -645,8 +801,6 @@
         const explorePage = document.getElementById('explore-page');
         const privacyModal = document.getElementById('privacy-modal');
         const acceptPrivacyBtn = document.getElementById('accept-privacy');
-        const bgMusic = document.getElementById('bgMusic');
-        const musicBtn = document.getElementById('musicPlayerBtn');
 
         function hasAcceptedPrivacy() { return document.cookie.split('; ').find(row => row.startsWith('privacy_accepted=')); }
         function setPrivacyCookie() { const d = new Date(); d.setFullYear(d.getFullYear() + 1); document.cookie = `privacy_accepted=true; expires=${d.toUTCString()}; path=/; SameSite=Lax`; }
@@ -658,9 +812,11 @@
             updateAllPages();
             initMusic();
             initPinModal();
+            createVisualizerBars();
         }
 
         async function init() {
+            createVisualizerBars();
             if (!hasAcceptedPrivacy()) {
                 privacyModal.style.display = 'flex';
                 acceptPrivacyBtn.addEventListener('click', () => { setPrivacyCookie(); privacyModal.style.display = 'none'; startSite(); });
@@ -690,10 +846,7 @@
         }
 
         function initMusic() {
-            bgMusic.play().then(() => musicBtn.classList.add('playing')).catch(() => { const play = () => { bgMusic.play(); document.removeEventListener('click', play); }; document.addEventListener('click', play); });
-            musicBtn.addEventListener('click', () => { if (bgMusic.paused) bgMusic.play().then(()=>musicBtn.classList.add('playing')); else bgMusic.pause(); });
-            bgMusic.addEventListener('play', () => musicBtn.classList.add('playing'));
-            bgMusic.addEventListener('pause', () => musicBtn.classList.remove('playing'));
+            // 音乐按钮事件已在前面定义
         }
 
         function initPinModal() {
