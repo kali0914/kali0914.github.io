@@ -106,6 +106,13 @@
         @keyframes rotatePlayBtn { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
         /* 资源下载样式 */
+        .resource-toolbar {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
         .resource-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:15px; margin-top:25px; }
         .resource-card { background:rgba(0,0,0,0.4); border-radius:12px; padding:15px; display:flex; align-items:center; gap:12px; transition:0.3s; border:1px solid transparent; }
         .resource-card:hover { border-color:var(--green); transform:translateY(-3px); background:rgba(0,0,0,0.6); }
@@ -114,7 +121,11 @@
         .resource-name { font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .resource-meta { font-size:0.8rem; color:#aaa; margin-top:3px; }
         .resource-actions { display:flex; gap:8px; }
-        .resource-btn { background:none; border:1px solid rgba(255,255,255,0.3); border-radius:8px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:white; cursor:pointer; transition:0.2s; }
+        .resource-btn {
+            background:none; border:1px solid rgba(255,255,255,0.3); border-radius:8px;
+            width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+            color:white; cursor:pointer; transition:0.2s; font-size:1rem;
+        }
         .resource-btn:hover { background:var(--blue); border-color:var(--blue); }
         .refresh-btn { background:rgba(46,204,113,0.2); border:1px solid var(--green); color:var(--green); padding:8px 20px; border-radius:20px; cursor:pointer; margin-bottom:15px; transition:0.2s; }
         .refresh-btn:hover { background:rgba(46,204,113,0.4); }
@@ -207,20 +218,28 @@
                     <a href="https://www.kdocs.cn/l/cbonhRM9lX11/" class="sticky-note" target="_blank">我的启示录</a>
                     <a href="https://mp.weixin.qq.com/s/F3oyLjAK2QMVdiV_gxROYA" class="sticky-note" target="_blank">花了1个月，在互联网上安了一个家</a>
                     <a href="https://mp.weixin.qq.com/s/sFTLecsZ9XcqVVENCQddGQ" class="sticky-note" target="_blank">从零搭建一个带用户系统的静态网站：我的技术实践与思考</a>
+                    <a href="https://mp.weixin.qq.com/s/nKye3ETn7SnNqln9Kvwqbg" class="sticky-note" target="_blank">一个10后站长的自述：我的网站排在第17页</a>
                 </div>
             </div>
 
             <!-- 资源下载区域 -->
             <div class="resource-section" id="resourceSection">
                 <h2 class="section-title"><i class="fas fa-cloud-download-alt"></i> 资源下载</h2>
-                <button class="refresh-btn" id="refreshResourcesBtn"><i class="fas fa-sync-alt"></i> 刷新列表</button>
+                <div class="resource-toolbar">
+                    <button class="refresh-btn" id="backResourceBtn" title="返回上一级">
+                        <i class="fas fa-arrow-left"></i> 上一级
+                    </button>
+                    <button class="refresh-btn" id="refreshResourcesBtn">
+                        <i class="fas fa-sync-alt"></i> 刷新列表
+                    </button>
+                </div>
                 <div class="resource-grid" id="resourceGrid">
                     <div style="color:#aaa; text-align:center; grid-column:1/-1;">
                         <i class="fas fa-spinner fa-pulse"></i> 加载中...
                     </div>
                 </div>
                 <p style="color:#666; text-align:center; font-size:0.75rem; margin-top:15px;">
-                    数据来源：坚果云 WebDAV
+                    数据来源：坚果云 WebDAV（website 文件夹）
                 </p>
             </div>
 
@@ -444,73 +463,184 @@
             friendLinks: [
                 { name: "一位苹果软件开发者", url: "https://iamadman.com" },
                 { name: "黄客联盟", url: "https://hklm.91kjwl.cn" },
-                { name: "梦晨云", url: "https://idc.xileu.xyz" }
+                { name: "梦晨云", url: "https://idc.xileu.xyz" },
+                { name: "ZHDD空间", url: "https://zhdd.bbroot.com" }
             ],
             system: { copyright: "阳光森林 © 2026 版权所有 V2.4" }
         };
 
         // ==================== 坚果云资源下载 ====================
-        const WORKER_URL = 'https://apijgy.ygsl.us.ci';
+        const RESOURCE_WORKER_URL = 'https://apijgy.ygsl.us.ci/';
         const resourceGrid = document.getElementById('resourceGrid');
-        const refreshBtn = document.getElementById('refreshResourcesBtn');
+        const refreshResourcesBtn = document.getElementById('refreshResourcesBtn');
+        const backResourceBtn = document.getElementById('backResourceBtn');
+        const DEFAULT_FOLDER = 'website';
+        let currentResourcePath = DEFAULT_FOLDER;
 
-        async function loadResources() {
+        function formatSize(bytes) {
+            if (!bytes) return '—';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleDateString('zh-CN');
+        }
+
+        function getParentPath(path) {
+            if (!path || path === DEFAULT_FOLDER) return DEFAULT_FOLDER;
+            const parts = path.split('/');
+            parts.pop();
+            return parts.join('/') || DEFAULT_FOLDER;
+        }
+
+        async function loadResourceFiles(path) {
             resourceGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1;"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>';
             try {
-                const resp = await fetch(WORKER_URL);
-                if (!resp.ok) throw new Error('请求失败');
-                const xml = await resp.text();
-                const files = parseFiles(xml);
-                if (files.length === 0) {
-                    resourceGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1;">暂无文件</div>';
-                    return;
-                }
-                resourceGrid.innerHTML = files.map(f => {
-                    const ext = f.name.split('.').pop().toLowerCase();
-                    let icon = 'fa-file', color = '#888';
-                    if (['jpg','jpeg','png','gif','bmp','svg','webp'].includes(ext)) { icon='fa-file-image'; color='#3498db'; }
-                    else if (['mp3','wav','flac','ogg','m4a'].includes(ext)) { icon='fa-file-audio'; color='#9b59b6'; }
-                    else if (['mp4','avi','mkv','mov'].includes(ext)) { icon='fa-file-video'; color='#e67e22'; }
-                    else if (['zip','rar','7z','tar','gz'].includes(ext)) { icon='fa-file-archive'; color='#f1c40f'; }
-                    else if (ext === 'pdf') { icon='fa-file-pdf'; color='#e74c3c'; }
-                    const size = f.size ? (f.size / 1024).toFixed(1) + ' KB' : '';
-                    const dl = WORKER_URL + '?path=' + encodeURIComponent(f.relativePath);
-                    return `<div class="resource-card">
-                        <div class="resource-icon" style="background:${color}22; color:${color}"><i class="fas ${icon}"></i></div>
-                        <div class="resource-info">
-                            <div class="resource-name" title="${f.name}">${f.name}</div>
-                            <div class="resource-meta">${size} · ${f.lastModified?.split('T')[0] || ''}</div>
-                        </div>
-                        <div class="resource-actions">
-                            <a class="resource-btn" href="${dl}" download title="下载"><i class="fas fa-download"></i></a>
-                        </div>
-                    </div>`;
-                }).join('');
-            } catch (e) {
-                resourceGrid.innerHTML = '<div style="color:#e74c3c; text-align:center; grid-column:1/-1;">❌ 加载失败，请确认代理已启动</div>';
+                const url = `${RESOURCE_WORKER_URL}?action=list&path=${encodeURIComponent(path)}`;
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const xmlText = await resp.text();
+                const files = parseResourceXML(xmlText, path);
+                renderResourceFiles(files);
+                currentResourcePath = path;
+            } catch (err) {
+                resourceGrid.innerHTML = `<div style="color:#e74c3c; text-align:center; grid-column:1/-1;">❌ 加载失败：${err.message}</div>`;
             }
         }
 
-        function parseFiles(xml) {
+        function parseResourceXML(xml, currentDir) {
             const doc = new DOMParser().parseFromString(xml, 'text/xml');
-            const resp = doc.getElementsByTagNameNS('DAV:', 'response');
-            const files = [];
-            for (let r of resp) {
-                const href = r.getElementsByTagNameNS('DAV:', 'href')[0]?.textContent?.trim();
-                if (!href) continue;
-                const name = r.getElementsByTagNameNS('DAV:', 'displayname')[0]?.textContent?.trim() || decodeURIComponent(href).split('/').filter(Boolean).pop();
+            const responses = doc.getElementsByTagNameNS('DAV:', 'response');
+            const items = [];
+            const basePath = currentDir ? currentDir + '/' : '';
+
+            for (let r of responses) {
+                const href = r.getElementsByTagNameNS('DAV:', 'href')[0]?.textContent || '';
+                let relativePath = href;
+                const davIndex = relativePath.indexOf('/dav/');
+                if (davIndex !== -1) {
+                    relativePath = relativePath.substring(davIndex + 5);
+                } else {
+                    continue;
+                }
+                relativePath = decodeURIComponent(relativePath).replace(/^\/+|\/+$/g, '');
+                if (!relativePath) continue;
+
+                if (relativePath === currentDir) continue;
+                if (!relativePath.startsWith(basePath)) continue;
+                const subPath = relativePath.substring(basePath.length);
+                if (!subPath || subPath.includes('/')) continue;
+
+                const name = r.getElementsByTagNameNS('DAV:', 'displayname')[0]?.textContent?.trim() ||
+                             decodeURIComponent(subPath);
                 const size = parseInt(r.getElementsByTagNameNS('DAV:', 'getcontentlength')[0]?.textContent || '0');
                 const lastmod = r.getElementsByTagNameNS('DAV:', 'getlastmodified')[0]?.textContent || '';
-                if (r.getElementsByTagNameNS('DAV:', 'collection').length > 0) continue;
-                if (!name || name.startsWith('.')) continue;
-                files.push({ name, size, lastModified: lastmod, relativePath: name });
+                const isFolder = r.getElementsByTagNameNS('DAV:', 'collection').length > 0;
+
+                items.push({
+                    name: name,
+                    path: relativePath,
+                    isFolder: isFolder,
+                    size: isFolder ? 0 : size,
+                    lastModified: lastmod,
+                });
             }
-            return files;
+            return items;
         }
 
-        refreshBtn.addEventListener('click', loadResources);
+        function renderResourceFiles(files) {
+            if (!files.length) {
+                resourceGrid.innerHTML = '<div style="color:#aaa; text-align:center; grid-column:1/-1;">📭 此文件夹为空</div>';
+                return;
+            }
+            files.sort((a, b) => {
+                if (a.isFolder && !b.isFolder) return -1;
+                if (!a.isFolder && b.isFolder) return 1;
+                return a.name.localeCompare(b.name);
+            });
 
-        // 其余主页逻辑
+            let html = '';
+            for (const f of files) {
+                const icon = f.isFolder ? '📁' : '📄';
+                const sizeStr = f.isFolder ? '—' : formatSize(f.size);
+                const timeStr = formatDate(f.lastModified);
+                const downloadBtn = f.isFolder
+                    ? `<button class="resource-btn file-zip" data-path="${encodeURIComponent(f.path)}" title="下载ZIP"><i class="fas fa-arrow-down"></i></button>`
+                    : `<button class="resource-btn file-download" data-path="${encodeURIComponent(f.path)}" title="下载"><i class="fas fa-arrow-down"></i></button>`;
+
+                html += `
+                    <div class="resource-card ${f.isFolder ? 'folder-card' : ''}" data-path="${encodeURIComponent(f.path)}" data-folder="${f.isFolder}">
+                        <div class="resource-icon">${icon}</div>
+                        <div class="resource-info">
+                            <div class="resource-name">${f.name}</div>
+                            <div class="resource-meta">${sizeStr} ${timeStr ? '· ' + timeStr : ''}</div>
+                        </div>
+                        <div class="resource-actions">
+                            ${downloadBtn}
+                        </div>
+                    </div>
+                `;
+            }
+            resourceGrid.innerHTML = html;
+
+            document.querySelectorAll('.folder-card').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('.file-download') || e.target.closest('.file-zip')) return;
+                    const path = decodeURIComponent(el.dataset.path);
+                    loadResourceFiles(path);
+                });
+            });
+
+            document.querySelectorAll('.file-download').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const path = decodeURIComponent(btn.dataset.path);
+                    const url = `${RESOURCE_WORKER_URL}?action=download&path=${encodeURIComponent(path)}`;
+                    window.open(url, '_blank');
+                });
+            });
+
+            document.querySelectorAll('.file-zip').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const path = decodeURIComponent(btn.dataset.path);
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                    btn.disabled = true;
+                    try {
+                        const url = `${RESOURCE_WORKER_URL}?action=zip&path=${encodeURIComponent(path)}`;
+                        const resp = await fetch(url);
+                        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                        const blob = await resp.blob();
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = (path.split('/').pop() || 'folder') + '.zip';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    } catch (err) {
+                        alert('打包失败：' + err.message);
+                    } finally {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }
+                });
+            });
+        }
+
+        backResourceBtn.addEventListener('click', () => {
+            if (currentResourcePath === DEFAULT_FOLDER) return;
+            const parentPath = getParentPath(currentResourcePath);
+            loadResourceFiles(parentPath);
+        });
+
+        refreshResourcesBtn.addEventListener('click', () => loadResourceFiles(currentResourcePath));
+
+        // ==================== 主页逻辑 ====================
         const homePage = document.getElementById('home-page');
         const explorePage = document.getElementById('explore-page');
         const privacyModal = document.getElementById('privacy-modal');
@@ -544,6 +674,7 @@
             document.getElementById('quoteText').textContent = quoteLibrary[i].text;
             document.getElementById('quoteAuthor').textContent = '—— ' + quoteLibrary[i].author;
         }
+
         function updateAllPages() {
             document.querySelector('#home-page .home-footer-copyright').textContent = defaultSettings.system.copyright;
             document.querySelector('#explore-page .explore-footer p').textContent = defaultSettings.system.copyright;
@@ -552,16 +683,19 @@
             document.getElementById('contactButtonsContainer').innerHTML = defaultSettings.contacts.map(c => `<a href="${c.url}" class="contact-btn" target="${c.url.startsWith('mailto')?'_self':'_blank'}"><i class="${c.icon}"></i><div><div>${c.name}</div><div class="contact-value">${c.value}</div></div></a>`).join('');
             document.getElementById('friendLinksContainer').innerHTML = '<h3>友情链接</h3>' + defaultSettings.friendLinks.map(f => `<a href="${f.url}" class="friend-link-item" target="_blank"><i class="fas fa-external-link-alt"></i> ${f.name}</a>`).join('');
         }
+
         function setupRightClick() {
             document.addEventListener('contextmenu', e => { e.preventDefault(); document.getElementById('rightClickWarning').style.display='block'; setTimeout(()=>document.getElementById('rightClickWarning').style.display='none',3000); });
             ['selectstart','dragstart','copy','cut','paste'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
         }
+
         function initMusic() {
             bgMusic.play().then(() => musicBtn.classList.add('playing')).catch(() => { const play = () => { bgMusic.play(); document.removeEventListener('click', play); }; document.addEventListener('click', play); });
             musicBtn.addEventListener('click', () => { if (bgMusic.paused) bgMusic.play().then(()=>musicBtn.classList.add('playing')); else bgMusic.pause(); });
             bgMusic.addEventListener('play', () => musicBtn.classList.add('playing'));
             bgMusic.addEventListener('pause', () => musicBtn.classList.remove('playing'));
         }
+
         function initPinModal() {
             document.getElementById('adminBtn').addEventListener('click', e => { e.preventDefault(); document.getElementById('pinModal').classList.add('active'); setTimeout(()=>document.getElementById('pin0').focus(),100); });
             document.getElementById('closePinModal').addEventListener('click', () => document.getElementById('pinModal').classList.remove('active'));
@@ -580,7 +714,7 @@
         document.getElementById('exploreBtn').addEventListener('click', () => {
             homePage.style.display='none';
             explorePage.style.display='block';
-            loadResources(); // 切换到探索页时加载资源列表
+            loadResourceFiles(DEFAULT_FOLDER);
         });
         document.getElementById('backToHome').addEventListener('click', e => { e.preventDefault(); explorePage.style.display='none'; homePage.style.display='block'; });
 
