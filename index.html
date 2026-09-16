@@ -15,14 +15,28 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
         body {
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
             background-color: var(--dark-bg); color: #fff; min-height: 100vh; overflow-x: hidden;
             background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;
             background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('photo3.jpg');
         }
-        a, button, .circular-action-btn, .friend-link-item, .music-player-btn, .sticky-note, .admin-link {
-            cursor: pointer;
+
+        /* ============ 自定义光标 ============ */
+        html, body {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%233498db"/><stop offset="1" stop-color="%23e84393"/></linearGradient></defs><path d="M5 3 L5 22 L10 17 L13.5 24 L16.5 22.5 L13 15.5 L20 15 Z" fill="url(%23g1)" stroke="white" stroke-width="1.2" stroke-linejoin="round"/></svg>') 5 3, auto;
         }
+        a, button, [role="button"],
+        .circular-action-btn, .friend-link-item, .music-player-btn,
+        .sticky-note, .admin-link, .agreement-link, .agreement-btn,
+        .refresh-btn, .resource-btn, .contact-btn, .folder-card,
+        .ctx-item, .pin-btn, .close-pin, .doc-modal-close,
+        .qrcode-close, .back-to-home, .privacy-btn {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%232ecc71"/><stop offset="1" stop-color="%233498db"/></linearGradient></defs><circle cx="15" cy="15" r="10" fill="none" stroke="url(%23g2)" stroke-width="2" opacity="0.9"/><circle cx="15" cy="15" r="4" fill="url(%23g2)"/><circle cx="15" cy="15" r="12" fill="none" stroke="%233498db" stroke-width="1" opacity="0.35"/></svg>') 15 15, pointer;
+        }
+        input, textarea, [contenteditable="true"] {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="24" viewBox="0 0 16 24"><rect x="7" y="3" width="2" height="18" fill="%233498db" rx="1"/><circle cx="8" cy="12" r="7" fill="none" stroke="%233498db" stroke-width="1" opacity="0.3"/></svg>') 8 12, text;
+        }
+        button:disabled, .resource-btn:disabled { cursor: not-allowed; }
+
         .fullscreen-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(10px);
@@ -78,7 +92,6 @@
         }
         .agreement-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(52,152,219,0.3); }
 
-        /* 文档内容弹窗 */
         .doc-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -111,7 +124,6 @@
         }
         .doc-modal-close:hover { color: #fff; }
 
-        /* 隐私政策弹窗（旧版兼容） */
         .privacy-modal {
             background: rgba(26,31,46,0.95); border-radius: 30px; padding: 40px;
             max-width: 700px; width: 90%; border: 1px solid rgba(52,152,219,0.4);
@@ -126,9 +138,56 @@
         }
         .privacy-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(52,152,219,0.3); }
 
-        .right-click-warning { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(231,76,60,0.95); color: white; padding: 20px 30px; border-radius: 10px; z-index: 9999; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid white; animation: warningPulse 0.5s; }
-        @keyframes warningPulse { 0% { transform: translate(-50%,-50%) scale(0.8); opacity: 0; } 70% { transform: translate(-50%,-50%) scale(1.05); } 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; } }
-        .right-click-warning i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+        /* ============ 自定义右键菜单 ============ */
+        .custom-context-menu {
+            position: fixed;
+            z-index: 9999999;
+            min-width: 190px;
+            background: rgba(26,31,46,0.98);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(52,152,219,0.4);
+            border-radius: 12px;
+            padding: 6px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            display: none;
+            animation: ctxFadeIn 0.15s ease;
+        }
+        .custom-context-menu.active { display: block; }
+        @keyframes ctxFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .custom-context-menu .ctx-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 8px;
+            color: #ddd; font-size: 0.9rem; cursor: pointer;
+            transition: 0.15s; user-select: none;
+        }
+        .custom-context-menu .ctx-item:hover {
+            background: rgba(52,152,219,0.25); color: #fff;
+        }
+        .custom-context-menu .ctx-item i {
+            width: 16px; text-align: center; color: var(--blue);
+        }
+        .custom-context-menu .ctx-item.disabled {
+            opacity: 0.35; cursor: not-allowed;
+        }
+        .custom-context-menu .ctx-item.disabled:hover {
+            background: transparent; color: #ddd;
+        }
+        .custom-context-menu .ctx-divider {
+            height: 1px; background: rgba(255,255,255,0.1); margin: 4px 8px;
+        }
+
+        /* ============ 轻提示 ============ */
+        .site-toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: rgba(46,204,113,0.95); color: #fff; padding: 12px 24px;
+            border-radius: 30px; font-size: 0.9rem; z-index: 99999999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .site-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         .pin-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 20000; justify-content: center; align-items: center; }
         .pin-modal.active { display: flex; }
@@ -250,7 +309,6 @@
     </style>
 </head>
 <body>
-    <!-- 初始用户协议弹窗（docx 版本） -->
     <div class="agreement-overlay" id="agreementOverlay">
         <div class="agreement-card">
             <h2><i class="fas fa-shield-alt"></i> 欢迎访问阳光森林</h2>
@@ -264,7 +322,6 @@
         </div>
     </div>
 
-    <!-- 文档内容弹窗 -->
     <div class="doc-modal" id="docModal">
         <div class="doc-modal-card">
             <button class="doc-modal-close" id="closeDocModal"><i class="fas fa-times"></i></button>
@@ -273,7 +330,6 @@
         </div>
     </div>
 
-    <!-- 隐私政策弹窗（旧版兼容） -->
     <div id="privacy-modal" class="fullscreen-overlay" style="display: none;">
         <div class="privacy-modal">
             <h2 class="privacy-title"><i class="fas fa-shield-alt"></i> 隐私政策</h2>
@@ -282,7 +338,6 @@
         </div>
     </div>
 
-    <!-- 管理员邀请码弹窗 -->
     <div class="pin-modal" id="pinModal">
         <div class="pin-card">
             <h3><i class="fas fa-lock"></i> 管理员通道</h3>
@@ -300,7 +355,6 @@
         </div>
     </div>
 
-    <!-- 公众号二维码弹窗 -->
     <div class="qrcode-modal" id="qrcodeModal">
         <div class="qrcode-card">
             <button class="qrcode-close" id="closeQrcodeModal"><i class="fas fa-times"></i></button>
@@ -309,12 +363,21 @@
         </div>
     </div>
 
-    <div class="right-click-warning" id="rightClickWarning"><i class="fas fa-ban"></i><p>本站禁止使用右键</p></div>
+    <!-- 自定义右键菜单 -->
+    <div class="custom-context-menu" id="customContextMenu">
+        <div class="ctx-item" data-action="viewSource"><i class="fas fa-code"></i> 查看源代码</div>
+        <div class="ctx-item" data-action="copy"><i class="fas fa-copy"></i> 复制</div>
+        <div class="ctx-divider"></div>
+        <div class="ctx-item" data-action="downloadImage"><i class="fas fa-download"></i> 下载图片</div>
+    </div>
+
+    <!-- 轻提示 -->
+    <div class="site-toast" id="siteToast"></div>
+
     <audio id="bgMusic" preload="auto" style="display:none;"></audio>
     <div class="music-visualizer hidden" id="musicVisualizer"></div>
     <div class="music-player-btn" id="musicPlayerBtn" title="播放/暂停音乐"><i class="fas fa-music"></i></div>
 
-    <!-- 主页 -->
     <div id="home-page">
         <div class="home-container">
             <h1 class="home-title">阳光森林-网络安全空间</h1>
@@ -336,7 +399,6 @@
         </div>
     </div>
 
-    <!-- 探索页 -->
     <div id="explore-page">
         <div class="explore-container">
             <div class="explore-header"><h1 class="explore-title">阳光森林 - 网络安全空间</h1><a href="#" class="back-to-home" id="backToHome"><i class="fas fa-arrow-left"></i> 返回主页</a></div>
@@ -352,7 +414,6 @@
                 </div>
             </div>
 
-            <!-- 资源下载区域 -->
             <div class="resource-section" id="resourceSection">
                 <h2 class="section-title">资源下载</h2>
                 <div class="resource-toolbar">
@@ -402,10 +463,20 @@
                 { name: "一位苹果软件开发者", url: "https://iamadman.com" },
                 { name: "黄客联盟", url: "https://hklm.91kjwl.cn" },
                 { name: "梦晨云", url: "https://idc.xileu.xyz" },
-                { name: "ZHDD空间", url: "https://zhdd.bbroot.com" }
+                { name: "ZHDD空间", url: "https://zhdd.bbroot.com" },
+                { name: "小满工作室", url: "https://xiaomanstudio.cn" }
             ],
             system: { copyright: "阳光森林 © 2026 版权所有 V2.4" }
         };
+
+        // ==================== 轻提示 ====================
+        function showToast(msg) {
+            const t = document.getElementById('siteToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+        }
 
         // ==================== Word 文档解析 ====================
         async function loadDocxText(url) {
@@ -463,7 +534,6 @@
                 }
                 return { text: line, author: '未知' };
             });
-            // 如果解析失败或为空，给一个兜底
             if (quoteLibrary.length === 0) {
                 quoteLibrary = [{ text: "学而时习之，不亦说乎。", author: "孔子" }];
             }
@@ -488,6 +558,7 @@
         let musicFiles = [];
         let currentMusicIndex = 0;
         let isPlaying = false;
+        let musicReady = false;
         let visualizerBars = [];
         const barCount = 60;
 
@@ -505,13 +576,21 @@
         }
 
         function initAudioContext() {
-            if (audioCtx) return;
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            source = audioCtx.createMediaElementSource(bgMusic);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
+            if (audioCtx) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                return;
+            }
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                source = audioCtx.createMediaElementSource(bgMusic);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            } catch (e) {
+                console.warn('AudioContext 初始化失败：', e);
+            }
         }
 
         function updateVisualizer() {
@@ -532,24 +611,42 @@
             requestAnimationFrame(updateVisualizer);
         }
 
-        async function detectMusicFilesAndShuffle() {
-            const candidates = [
-                'music/music1.mp3', 'music/music2.mp3', 'music/music3.mp3',
-                'music/music4.mp3', 'music/music5.mp3', 'music/music6.mp3',
-                'music/music7.mp3', 'music/music8.mp3', 'music/music9.mp3',
-                'music/music10.mp3'
-            ];
-            const results = await Promise.allSettled(
-                candidates.map(name => fetch(name, { method: 'HEAD', cache: 'no-store' }))
-            );
-            const available = [];
-            results.forEach((result, index) => {
-                if (result.status === 'fulfilled' && result.value.ok) {
-                    available.push(candidates[index]);
+        async function detectMusicFiles() {
+            const found = new Set();
+            try {
+                const resp = await fetch('music/', { cache: 'no-store' });
+                if (resp.ok) {
+                    const text = await resp.text();
+                    const re = /href\s*=\s*["']([^"']+\.mp3)["']/gi;
+                    let m;
+                    while ((m = re.exec(text)) !== null) {
+                        let p = m[1];
+                        if (/^https?:\/\//i.test(p)) {
+                            found.add(p);
+                        } else {
+                            p = p.replace(/^\.?\//, '');
+                            found.add(p.startsWith('music/') ? p : 'music/' + p);
+                        }
+                    }
                 }
-            });
-            if (available.length === 0) available.push('music/music1.mp3');
-            return shuffleArray(available);
+            } catch (e) {
+                console.warn('目录列表读取失败，改用候选探测', e);
+            }
+
+            if (found.size === 0) {
+                const candidates = [];
+                for (let i = 1; i <= 30; i++) candidates.push('music/music' + i + '.mp3');
+                const results = await Promise.allSettled(
+                    candidates.map(name => fetch(name, { method: 'HEAD', cache: 'no-store' }))
+                );
+                results.forEach((r, i) => {
+                    if (r.status === 'fulfilled' && r.value.ok) found.add(candidates[i]);
+                });
+            }
+
+            const list = [...found];
+            console.log('检测到音乐文件：', list);
+            return list;
         }
 
         function shuffleArray(arr) {
@@ -562,46 +659,66 @@
 
         function playMusicAtIndex(index) {
             if (musicFiles.length === 0) return;
-            currentMusicIndex = index % musicFiles.length;
+            currentMusicIndex = ((index % musicFiles.length) + musicFiles.length) % musicFiles.length;
             bgMusic.src = musicFiles[currentMusicIndex];
             bgMusic.loop = false;
-            bgMusic.play().then(() => {
-                isPlaying = true;
-                musicBtn.classList.add('playing');
-                initAudioContext();
-                updateVisualizer();
-            }).catch(() => {});
+            initAudioContext();
+            const p = bgMusic.play();
+            if (p && p.then) {
+                p.then(() => {
+                    isPlaying = true;
+                    musicBtn.classList.add('playing');
+                    updateVisualizer();
+                }).catch(err => {
+                    console.warn('播放失败：', err);
+                    isPlaying = false;
+                    musicBtn.classList.remove('playing');
+                });
+            }
+        }
+
+        async function initMusicAndPlay() {
+            if (musicReady) {
+                if (!isPlaying && musicFiles.length) {
+                    const p = bgMusic.play();
+                    if (p && p.then) p.catch(() => {});
+                }
+                return;
+            }
+            musicReady = true;
+            musicBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+            musicFiles = shuffleArray(await detectMusicFiles());
+            musicBtn.innerHTML = '<i class="fas fa-music"></i>';
+            if (musicFiles.length > 0) {
+                playMusicAtIndex(0);
+            } else {
+                console.warn('未找到任何 mp3 文件');
+            }
         }
 
         bgMusic.addEventListener('ended', () => {
             if (musicFiles.length > 1) {
                 playMusicAtIndex(currentMusicIndex + 1);
-            } else {
+            } else if (musicFiles.length === 1) {
                 bgMusic.currentTime = 0;
-                bgMusic.play();
+                bgMusic.play().catch(() => {});
             }
         });
 
         musicBtn.addEventListener('click', async () => {
-            if (!musicFiles.length) {
-                musicBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
-                musicFiles = await detectMusicFilesAndShuffle();
-                musicBtn.innerHTML = '<i class="fas fa-music"></i>';
-                if (musicFiles.length > 0) playMusicAtIndex(0);
+            if (!musicReady) {
+                await initMusicAndPlay();
+                return;
+            }
+            if (isPlaying) {
+                bgMusic.pause();
             } else {
-                if (isPlaying) {
-                    bgMusic.pause();
-                    isPlaying = false;
-                    musicBtn.classList.remove('playing');
-                    visualizer.classList.add('hidden');
-                } else {
-                    bgMusic.play().then(() => {
-                        isPlaying = true;
-                        musicBtn.classList.add('playing');
-                        initAudioContext();
-                        updateVisualizer();
-                    });
-                }
+                initAudioContext();
+                bgMusic.play().then(() => {
+                    isPlaying = true;
+                    musicBtn.classList.add('playing');
+                    updateVisualizer();
+                }).catch(() => {});
             }
         });
 
@@ -615,6 +732,84 @@
             musicBtn.classList.add('playing');
             visualizer.classList.remove('hidden');
         });
+
+        // ==================== 自定义右键菜单 ====================
+        function setupRightClick() {
+            const menu = document.getElementById('customContextMenu');
+            const downloadItem = menu.querySelector('[data-action="downloadImage"]');
+            let currentImg = null;
+
+            document.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                currentImg = e.target.tagName === 'IMG' ? e.target : (e.target.closest('img') || null);
+                downloadItem.classList.toggle('disabled', !currentImg);
+
+                const menuW = 200, menuH = 170;
+                let x = e.clientX, y = e.clientY;
+                if (x + menuW > window.innerWidth)  x = window.innerWidth  - menuW - 10;
+                if (y + menuH > window.innerHeight) y = window.innerHeight - menuH - 10;
+                menu.style.left = x + 'px';
+                menu.style.top  = y + 'px';
+                menu.classList.add('active');
+            });
+
+            document.addEventListener('click', e => {
+                if (!menu.contains(e.target)) menu.classList.remove('active');
+            });
+            document.addEventListener('scroll', () => menu.classList.remove('active'), true);
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') menu.classList.remove('active');
+            });
+
+            menu.addEventListener('click', async e => {
+                const item = e.target.closest('.ctx-item');
+                if (!item || item.classList.contains('disabled')) return;
+                const action = item.dataset.action;
+                menu.classList.remove('active');
+
+                if (action === 'viewSource') {
+                    window.open('view-source:' + location.href, '_blank');
+
+                } else if (action === 'copy') {
+                    const sel = window.getSelection().toString();
+                    const text = sel || location.href;
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        showToast(sel ? '已复制选中内容' : '已复制页面链接');
+                    } catch {
+                        const ta = document.createElement('textarea');
+                        ta.value = text;
+                        ta.style.position = 'fixed';
+                        ta.style.opacity = '0';
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        showToast('已复制');
+                    }
+
+                } else if (action === 'downloadImage') {
+                    if (!currentImg) return;
+                    const src = currentImg.src;
+                    try {
+                        const resp = await fetch(src);
+                        const blob = await resp.blob();
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        const raw = src.split('/').pop().split('?')[0] || 'image';
+                        a.download = raw.includes('.') ? raw : raw + '.jpg';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+                        showToast('图片已开始下载');
+                    } catch (err) {
+                        window.open(src, '_blank');
+                        showToast('图片已在新标签打开');
+                    }
+                }
+            });
+        }
 
         // ==================== 坚果云资源下载 ====================
         const RESOURCE_WORKER_URL = 'https://apijgy.ygsl.us.ci/';
@@ -817,15 +1012,9 @@
         // ==================== 主页逻辑 ====================
         const homePage = document.getElementById('home-page');
         const explorePage = document.getElementById('explore-page');
-        const privacyModal = document.getElementById('privacy-modal');
-        const acceptPrivacyBtn = document.getElementById('accept-privacy');
-
-        function hasAcceptedPrivacy() { return document.cookie.split('; ').find(row => row.startsWith('privacy_accepted=')); }
-        function setPrivacyCookie() { const d = new Date(); d.setFullYear(d.getFullYear() + 1); document.cookie = `privacy_accepted=true; expires=${d.toUTCString()}; path=/; SameSite=Lax`; }
 
         function startSite() {
             pickRandomQuote();
-            setupRightClick();
             updateAllPages();
             initPinModal();
         }
@@ -849,11 +1038,6 @@
                     qrcodeModal.classList.add('active');
                 });
             }
-        }
-
-        function setupRightClick() {
-            document.addEventListener('contextmenu', e => { e.preventDefault(); document.getElementById('rightClickWarning').style.display='block'; setTimeout(()=>document.getElementById('rightClickWarning').style.display='none',3000); });
-            ['selectstart','dragstart','copy','cut','paste'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
         }
 
         function initPinModal() {
@@ -883,18 +1067,19 @@
         });
         document.getElementById('backToHome').addEventListener('click', e => { e.preventDefault(); explorePage.style.display='none'; homePage.style.display='block'; });
 
-        // 同意协议
         agreeBtn.addEventListener('click', () => {
             agreementOverlay.style.display = 'none';
             homePage.style.display = 'block';
             startSite();
+            initMusicAndPlay();   // 在用户手势中触发自动播放
         });
 
         // ==================== 页面初始化 ====================
         document.addEventListener('DOMContentLoaded', async () => {
             createVisualizerBars();
-            await loadQuotes();           // 先加载名言
-            agreementOverlay.style.display = 'flex'; // 显示协议弹窗
+            setupRightClick();
+            await loadQuotes();
+            agreementOverlay.style.display = 'flex';
         });
     </script>
 </body>
