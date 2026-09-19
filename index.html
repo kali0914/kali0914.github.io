@@ -392,7 +392,7 @@
             <div class="home-buttons"><button class="circular-action-btn" id="exploreBtn"><span>开始探索</span></button></div>
             <div class="home-footer">
                 <div class="footer-row">
-                    <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V2.4</div>
+                    <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V3.0</div>
                     <a href="#" class="admin-link" id="adminBtn"><i class="fas fa-user-shield"></i> 管理员通道</a>
                 </div>
             </div>
@@ -436,7 +436,7 @@
             <div class="friend-links-container" id="friendLinksContainer"><h3>友情链接</h3></div>
             <div class="explore-footer">
                 <div class="footer-row">
-                    <p>阳光森林 © 2026 版权所有 V2.4</p>
+                    <p>阳光森林 © 2026 版权所有 V3.0</p>
                     <a href="#" class="admin-link" id="adminBtnExplore"><i class="fas fa-user-shield"></i> 管理员通道</a>
                 </div>
             </div>
@@ -466,7 +466,7 @@
                 { name: "ZHDD空间", url: "https://zhdd.bbroot.com" },
                 { name: "小满工作室", url: "https://xiaomanstudio.cn" }
             ],
-            system: { copyright: "阳光森林 © 2026 版权所有 V2.4" }
+            system: { copyright: "阳光森林 © 2026 版权所有 V3.0" }
         };
 
         // ==================== 轻提示 ====================
@@ -554,12 +554,13 @@
 
         let audioCtx = null;
         let analyser = null;
-        let source = null;
+        let sourceNode = null;
         let musicFiles = [];
         let currentMusicIndex = 0;
         let isPlaying = false;
         let musicReady = false;
         let visualizerBars = [];
+        let rafId = null;
         const barCount = 60;
 
         function createVisualizerBars() {
@@ -577,26 +578,30 @@
 
         function initAudioContext() {
             if (audioCtx) {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
+                if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
                 return;
             }
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 256;
-                source = audioCtx.createMediaElementSource(bgMusic);
-                source.connect(analyser);
+                analyser.smoothingTimeConstant = 0.75;
+                if (!sourceNode) {
+                    sourceNode = audioCtx.createMediaElementSource(bgMusic);
+                }
+                sourceNode.connect(analyser);
                 analyser.connect(audioCtx.destination);
-                if (audioCtx.state === 'suspended') audioCtx.resume();
+                if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
             } catch (e) {
                 console.warn('AudioContext 初始化失败：', e);
             }
         }
 
-        function updateVisualizer() {
+        function renderVisualizer() {
             if (!analyser || !isPlaying) {
                 visualizerBars.forEach(bar => bar.style.height = '3px');
                 visualizer.classList.add('hidden');
+                rafId = null;
                 return;
             }
             visualizer.classList.remove('hidden');
@@ -608,7 +613,19 @@
                 const height = (value / 255) * 40;
                 visualizerBars[i].style.height = Math.max(3, height) + 'px';
             }
-            requestAnimationFrame(updateVisualizer);
+            rafId = requestAnimationFrame(renderVisualizer);
+        }
+
+        function startVisualizer() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(renderVisualizer);
+        }
+
+        function stopVisualizer() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = null;
+            visualizerBars.forEach(bar => bar.style.height = '3px');
+            visualizer.classList.add('hidden');
         }
 
         async function detectMusicFiles() {
@@ -660,19 +677,24 @@
         function playMusicAtIndex(index) {
             if (musicFiles.length === 0) return;
             currentMusicIndex = ((index % musicFiles.length) + musicFiles.length) % musicFiles.length;
+
+            initAudioContext();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+
             bgMusic.src = musicFiles[currentMusicIndex];
             bgMusic.loop = false;
-            initAudioContext();
+
             const p = bgMusic.play();
             if (p && p.then) {
                 p.then(() => {
                     isPlaying = true;
                     musicBtn.classList.add('playing');
-                    updateVisualizer();
+                    startVisualizer();
                 }).catch(err => {
                     console.warn('播放失败：', err);
                     isPlaying = false;
                     musicBtn.classList.remove('playing');
+                    stopVisualizer();
                 });
             }
         }
@@ -680,8 +702,12 @@
         async function initMusicAndPlay() {
             if (musicReady) {
                 if (!isPlaying && musicFiles.length) {
-                    const p = bgMusic.play();
-                    if (p && p.then) p.catch(() => {});
+                    initAudioContext();
+                    bgMusic.play().then(() => {
+                        isPlaying = true;
+                        musicBtn.classList.add('playing');
+                        startVisualizer();
+                    }).catch(() => {});
                 }
                 return;
             }
@@ -717,7 +743,7 @@
                 bgMusic.play().then(() => {
                     isPlaying = true;
                     musicBtn.classList.add('playing');
-                    updateVisualizer();
+                    startVisualizer();
                 }).catch(() => {});
             }
         });
@@ -725,12 +751,13 @@
         bgMusic.addEventListener('pause', () => {
             isPlaying = false;
             musicBtn.classList.remove('playing');
-            visualizer.classList.add('hidden');
+            stopVisualizer();
         });
+
         bgMusic.addEventListener('play', () => {
             isPlaying = true;
             musicBtn.classList.add('playing');
-            visualizer.classList.remove('hidden');
+            startVisualizer();
         });
 
         // ==================== 自定义右键菜单 ====================
@@ -1071,7 +1098,7 @@
             agreementOverlay.style.display = 'none';
             homePage.style.display = 'block';
             startSite();
-            initMusicAndPlay();   // 在用户手势中触发自动播放
+            initMusicAndPlay();
         });
 
         // ==================== 页面初始化 ====================
