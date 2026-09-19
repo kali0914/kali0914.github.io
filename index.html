@@ -374,7 +374,7 @@
     <!-- 轻提示 -->
     <div class="site-toast" id="siteToast"></div>
 
-    <audio id="bgMusic" preload="auto" style="display:none;"></audio>
+    <audio id="bgMusic" preload="auto" crossorigin="anonymous" style="display:none;"></audio>
     <div class="music-visualizer hidden" id="musicVisualizer"></div>
     <div class="music-player-btn" id="musicPlayerBtn" title="播放/暂停音乐"><i class="fas fa-music"></i></div>
 
@@ -392,7 +392,7 @@
             <div class="home-buttons"><button class="circular-action-btn" id="exploreBtn"><span>开始探索</span></button></div>
             <div class="home-footer">
                 <div class="footer-row">
-                    <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V3.0</div>
+                    <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V3.1</div>
                     <a href="#" class="admin-link" id="adminBtn"><i class="fas fa-user-shield"></i> 管理员通道</a>
                 </div>
             </div>
@@ -436,7 +436,7 @@
             <div class="friend-links-container" id="friendLinksContainer"><h3>友情链接</h3></div>
             <div class="explore-footer">
                 <div class="footer-row">
-                    <p>阳光森林 © 2026 版权所有 V3.0</p>
+                    <p>阳光森林 © 2026 版权所有 V3.1</p>
                     <a href="#" class="admin-link" id="adminBtnExplore"><i class="fas fa-user-shield"></i> 管理员通道</a>
                 </div>
             </div>
@@ -466,7 +466,7 @@
                 { name: "ZHDD空间", url: "https://zhdd.bbroot.com" },
                 { name: "小满工作室", url: "https://xiaomanstudio.cn" }
             ],
-            system: { copyright: "阳光森林 © 2026 版权所有 V3.0" }
+            system: { copyright: "阳光森林 © 2026 版权所有 V3.1" }
         };
 
         // ==================== 轻提示 ====================
@@ -547,7 +547,7 @@
             document.getElementById('quoteAuthor').textContent = '—— ' + quoteLibrary[i].author;
         }
 
-        // ==================== 音乐系统 ====================
+        // ==================== 音乐系统（V3.1 修复版） ====================
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicPlayerBtn');
         const visualizer = document.getElementById('musicVisualizer');
@@ -555,6 +555,7 @@
         let audioCtx = null;
         let analyser = null;
         let sourceNode = null;
+        let gainNode = null;
         let musicFiles = [];
         let currentMusicIndex = 0;
         let isPlaying = false;
@@ -576,6 +577,7 @@
             visualizer.classList.add('hidden');
         }
 
+        // 只建一次 AudioContext 与 source → analyser → destination 链路
         function initAudioContext() {
             if (audioCtx) {
                 if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
@@ -583,17 +585,26 @@
             }
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 256;
                 analyser.smoothingTimeConstant = 0.75;
+
+                gainNode = audioCtx.createGain();
+                gainNode.gain.value = 1;
+
                 if (!sourceNode) {
                     sourceNode = audioCtx.createMediaElementSource(bgMusic);
                 }
+                // source → analyser → gain → destination
                 sourceNode.connect(analyser);
-                analyser.connect(audioCtx.destination);
+                analyser.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
                 if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+                console.log('✅ AudioContext 初始化完成, state:', audioCtx.state);
             } catch (e) {
-                console.warn('AudioContext 初始化失败：', e);
+                console.warn('❌ AudioContext 初始化失败：', e);
             }
         }
 
@@ -605,8 +616,10 @@
                 return;
             }
             visualizer.classList.remove('hidden');
+
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
             analyser.getByteFrequencyData(dataArray);
+
             const step = Math.floor(dataArray.length / barCount);
             for (let i = 0; i < barCount; i++) {
                 const value = dataArray[i * step] || 0;
@@ -674,28 +687,47 @@
             return arr;
         }
 
+        // 关键修复：先建链路，等 canplay，再 play
         function playMusicAtIndex(index) {
             if (musicFiles.length === 0) return;
             currentMusicIndex = ((index % musicFiles.length) + musicFiles.length) % musicFiles.length;
 
+            // 1. 确保音频链路已建好，且 ctx 处于 running
             initAudioContext();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
 
+            // 2. 设置新歌
             bgMusic.src = musicFiles[currentMusicIndex];
             bgMusic.loop = false;
 
-            const p = bgMusic.play();
-            if (p && p.then) {
-                p.then(() => {
-                    isPlaying = true;
-                    musicBtn.classList.add('playing');
-                    startVisualizer();
-                }).catch(err => {
-                    console.warn('播放失败：', err);
-                    isPlaying = false;
-                    musicBtn.classList.remove('playing');
-                    stopVisualizer();
-                });
+            // 3. 等 canplay 再 play，避免 analyser 读到空数据
+            const onCanPlay = () => {
+                bgMusic.removeEventListener('canplay', onCanPlay);
+
+                const p = bgMusic.play();
+                if (p && p.then) {
+                    p.then(() => {
+                        isPlaying = true;
+                        musicBtn.classList.add('playing');
+                        if (audioCtx && audioCtx.state === 'suspended') {
+                            audioCtx.resume().catch(() => {});
+                        }
+                        startVisualizer();
+                    }).catch(err => {
+                        console.warn('播放失败：', err);
+                        isPlaying = false;
+                        musicBtn.classList.remove('playing');
+                        stopVisualizer();
+                    });
+                }
+            };
+
+            if (bgMusic.readyState >= 3) {
+                onCanPlay();
+            } else {
+                bgMusic.addEventListener('canplay', onCanPlay);
             }
         }
 
