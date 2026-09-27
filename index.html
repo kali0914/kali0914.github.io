@@ -7,6 +7,7 @@
     <link rel="icon" href="photo1.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.18.0/js/md5.min.js"></script>
     <style>
         :root {
             --blue: #3498db; --red: #e74c3c; --pink: #e84393; --yellow: #f1c40f;
@@ -19,8 +20,6 @@
             background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;
             background-image: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.6)), url('photo3.jpg');
         }
-
-        /* ============ 自定义光标 ============ */
         html, body {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%233498db"/><stop offset="1" stop-color="%23e84393"/></linearGradient></defs><path d="M5 3 L5 22 L10 17 L13.5 24 L16.5 22.5 L13 15.5 L20 15 Z" fill="url(%23g1)" stroke="white" stroke-width="1.2" stroke-linejoin="round"/></svg>') 5 3, auto;
         }
@@ -29,7 +28,8 @@
         .sticky-note, .admin-link, .agreement-link, .agreement-btn,
         .refresh-btn, .resource-btn, .contact-btn, .folder-card,
         .ctx-item, .pin-btn, .close-pin, .doc-modal-close,
-        .qrcode-close, .back-to-home, .privacy-btn {
+        .qrcode-close, .back-to-home, .privacy-btn,
+        .donate-btn, .donate-close, .preset, .pay-method, .donate-submit {
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%232ecc71"/><stop offset="1" stop-color="%233498db"/></linearGradient></defs><circle cx="15" cy="15" r="10" fill="none" stroke="url(%23g2)" stroke-width="2" opacity="0.9"/><circle cx="15" cy="15" r="4" fill="url(%23g2)"/><circle cx="15" cy="15" r="12" fill="none" stroke="%233498db" stroke-width="1" opacity="0.35"/></svg>') 15 15, pointer;
         }
         input, textarea, [contenteditable="true"] {
@@ -44,45 +44,24 @@
             flex-direction: column; text-align: center; padding: 20px;
         }
         .agreement-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 14, 23, 0.96);
-            backdrop-filter: blur(15px);
-            z-index: 100000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 14, 23, 0.96); backdrop-filter: blur(15px);
+            z-index: 100000; display: flex; justify-content: center; align-items: center;
+            flex-direction: column; padding: 20px; text-align: center; animation: fadeIn 0.5s ease;
         }
         .agreement-card {
-            background: rgba(26,31,46,0.95);
-            border-radius: 25px;
-            padding: 40px 30px;
-            max-width: 550px;
-            width: 90%;
-            border: 1px solid rgba(52,152,219,0.4);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            max-height: 85vh;
-            overflow-y: auto;
+            background: rgba(26,31,46,0.95); border-radius: 25px; padding: 40px 30px;
+            max-width: 550px; width: 90%; border: 1px solid rgba(52,152,219,0.4);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6); max-height: 85vh; overflow-y: auto;
         }
         .agreement-card h2 { font-size: 1.8rem; margin-bottom: 15px; color: #fff; }
         .agreement-card p { color: #aaa; margin-bottom: 20px; line-height: 1.6; font-size: 0.95rem; }
         .agreement-links { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
         .agreement-link {
-            background: rgba(52,152,219,0.1);
-            border: 1px solid rgba(52,152,219,0.3);
-            border-radius: 12px;
-            padding: 12px 20px;
-            color: var(--blue);
-            text-decoration: none;
-            transition: 0.2s;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            font-size: 0.95rem;
+            background: rgba(52,152,219,0.1); border: 1px solid rgba(52,152,219,0.3);
+            border-radius: 12px; padding: 12px 20px; color: var(--blue);
+            text-decoration: none; transition: 0.2s; font-weight: 500; cursor: pointer;
+            text-align: center; font-size: 0.95rem;
         }
         .agreement-link:hover { background: rgba(52,152,219,0.25); color: #fff; }
         .agreement-btn {
@@ -93,28 +72,16 @@
         .agreement-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(52,152,219,0.3); }
 
         .doc-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 110000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.25s;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 110000;
+            display: flex; justify-content: center; align-items: center;
+            visibility: hidden; opacity: 0; transition: 0.25s;
         }
         .doc-modal.active { visibility: visible; opacity: 1; }
         .doc-modal-card {
-            background: rgba(26,31,46,0.95);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 700px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 1px solid rgba(52,152,219,0.4);
-            position: relative;
+            background: rgba(26,31,46,0.95); border-radius: 20px; padding: 30px;
+            max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto;
+            border: 1px solid rgba(52,152,219,0.4); position: relative;
         }
         .doc-modal-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: #fff; text-align: center; }
         .doc-modal-content { color: #ccc; line-height: 1.8; font-size: 0.95rem; white-space: pre-wrap; }
@@ -138,19 +105,11 @@
         }
         .privacy-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(52,152,219,0.3); }
 
-        /* ============ 自定义右键菜单 ============ */
         .custom-context-menu {
-            position: fixed;
-            z-index: 9999999;
-            min-width: 190px;
-            background: rgba(26,31,46,0.98);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(52,152,219,0.4);
-            border-radius: 12px;
-            padding: 6px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            display: none;
-            animation: ctxFadeIn 0.15s ease;
+            position: fixed; z-index: 9999999; min-width: 190px;
+            background: rgba(26,31,46,0.98); backdrop-filter: blur(12px);
+            border: 1px solid rgba(52,152,219,0.4); border-radius: 12px; padding: 6px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6); display: none; animation: ctxFadeIn 0.15s ease;
         }
         .custom-context-menu.active { display: block; }
         @keyframes ctxFadeIn {
@@ -163,23 +122,12 @@
             color: #ddd; font-size: 0.9rem; cursor: pointer;
             transition: 0.15s; user-select: none;
         }
-        .custom-context-menu .ctx-item:hover {
-            background: rgba(52,152,219,0.25); color: #fff;
-        }
-        .custom-context-menu .ctx-item i {
-            width: 16px; text-align: center; color: var(--blue);
-        }
-        .custom-context-menu .ctx-item.disabled {
-            opacity: 0.35; cursor: not-allowed;
-        }
-        .custom-context-menu .ctx-item.disabled:hover {
-            background: transparent; color: #ddd;
-        }
-        .custom-context-menu .ctx-divider {
-            height: 1px; background: rgba(255,255,255,0.1); margin: 4px 8px;
-        }
+        .custom-context-menu .ctx-item:hover { background: rgba(52,152,219,0.25); color: #fff; }
+        .custom-context-menu .ctx-item i { width: 16px; text-align: center; color: var(--blue); }
+        .custom-context-menu .ctx-item.disabled { opacity: 0.35; cursor: not-allowed; }
+        .custom-context-menu .ctx-item.disabled:hover { background: transparent; color: #ddd; }
+        .custom-context-menu .ctx-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 4px 8px; }
 
-        /* ============ 轻提示 ============ */
         .site-toast {
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-20px);
             background: rgba(46,204,113,0.95); color: #fff; padding: 12px 24px;
@@ -227,7 +175,19 @@
             background:rgba(26,31,46,0.85); border-radius:15px; padding:40px; margin-bottom:40px; backdrop-filter:blur(10px); border:1px solid rgba(52,152,219,0.2);
         }
         .resource-section { border-color: rgba(46, 204, 113, 0.3); }
-        .profile-header { display:flex; align-items:center; gap:30px; margin-bottom:30px; flex-wrap:wrap; }
+        .profile-header { display:flex; align-items:center; gap:30px; flex-wrap:wrap; }
+
+        /* ============ 个人介绍顶部：介绍 + 支持按钮 ============ */
+        .profile-section-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .profile-section-top .profile-header { margin-bottom: 0; }
+
         .profile-avatar { width:120px; height:120px; border-radius:50%; background:linear-gradient(45deg,var(--blue),var(--red),var(--yellow)); display:flex; align-items:center; justify-content:center; overflow:hidden; border:4px solid rgba(255,255,255,0.1); }
         .profile-avatar img { width:100%; height:100%; object-fit:cover; }
         .profile-info h2 { font-size:2.2rem; color:white; margin-bottom:10px; }
@@ -235,6 +195,111 @@
         .sticky-note { background:#fff9e6; border-radius:12px 12px 12px 0; padding:25px 15px; text-align:center; color:#2c3e50; font-weight:bold; font-size:1.3rem; box-shadow:0 10px 20px rgba(0,0,0,0.3); transition:transform 0.3s; text-decoration:none; display:block; }
         .sticky-note:hover { transform:translateY(-8px); }
         .section-title { font-size:2rem; margin-bottom:30px; color:#fff; }
+
+        /* ============ 支持我按钮 ============ */
+        .donate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: linear-gradient(45deg, #e84393, #f1c40f);
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1.05rem;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(232,67,147,0.35);
+            transition: 0.3s;
+            animation: donatePulse 2.5s ease-in-out infinite;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .donate-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(232,67,147,0.6);
+        }
+        .donate-btn i { font-size: 1.15rem; }
+        @keyframes donatePulse {
+            0%, 100% { box-shadow: 0 8px 20px rgba(232,67,147,0.35); }
+            50% { box-shadow: 0 14px 32px rgba(232,67,147,0.65); }
+        }
+
+        /* ============ 捐款弹窗 ============ */
+        .donate-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 120000;
+            display: flex; justify-content: center; align-items: center;
+            visibility: hidden; opacity: 0; transition: 0.25s; padding: 20px;
+        }
+        .donate-modal.active { visibility: visible; opacity: 1; }
+        .donate-card {
+            background: rgba(26,31,46,0.98); backdrop-filter: blur(15px);
+            border-radius: 22px; padding: 32px 28px;
+            width: 100%; max-width: 420px;
+            border: 1px solid rgba(232,67,147,0.4);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+            position: relative; animation: donateSlideIn 0.3s ease;
+        }
+        @keyframes donateSlideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .donate-card h3 { font-size: 1.5rem; margin-bottom: 6px; color: #fff; text-align: center; }
+        .donate-subtitle { text-align: center; color: #aaa; font-size: 0.9rem; margin-bottom: 22px; }
+        .donate-close {
+            position: absolute; top: 10px; right: 15px;
+            background: none; border: none; color: #aaa; font-size: 1.5rem; transition: 0.2s;
+        }
+        .donate-close:hover { color: #fff; }
+        .donate-presets {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 18px;
+        }
+        .preset {
+            padding: 10px 4px; background: rgba(52,152,219,0.1);
+            border: 1px solid rgba(52,152,219,0.3); border-radius: 10px;
+            color: var(--blue); font-size: 0.9rem; font-weight: bold; transition: 0.2s;
+        }
+        .preset:hover { background: rgba(52,152,219,0.25); color: #fff; }
+        .preset.active {
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            color: #fff; border-color: transparent;
+            box-shadow: 0 6px 16px rgba(232,67,147,0.35);
+        }
+        .donate-form-group { margin-bottom: 18px; }
+        .donate-form-group label { display: block; color: #ccc; font-size: 0.88rem; margin-bottom: 8px; }
+        .donate-form-group input[type="number"] {
+            width: 100%; padding: 12px 14px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(52,152,219,0.4);
+            border-radius: 10px; color: #fff; font-size: 1.1rem; font-weight: bold;
+            outline: none; transition: 0.2s;
+        }
+        .donate-form-group input[type="number"]:focus {
+            border-color: var(--blue); box-shadow: 0 0 12px rgba(52,152,219,0.4);
+        }
+        .donate-pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .pay-method { display: block; cursor: pointer; position: relative; }
+        .pay-method input { position: absolute; opacity: 0; pointer-events: none; }
+        .pay-method .pay-icon {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px; border: 2px solid rgba(255,255,255,0.12);
+            border-radius: 12px; background: rgba(0,0,0,0.35);
+            color: #aaa; font-weight: bold; transition: 0.2s;
+        }
+        .pay-method .pay-icon i { font-size: 1.3rem; }
+        .pay-method input:checked + .pay-icon {
+            border-color: var(--pink); background: rgba(232,67,147,0.15);
+            color: #fff; box-shadow: 0 6px 16px rgba(232,67,147,0.25);
+        }
+        .donate-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(45deg, var(--pink), var(--orange));
+            border: none; border-radius: 50px; color: #fff;
+            font-size: 1.05rem; font-weight: bold; transition: 0.3s; margin-top: 6px;
+        }
+        .donate-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(232,67,147,0.45); }
+        .donate-submit:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
+        .donate-tip { text-align: center; color: #777; font-size: 0.78rem; margin-top: 14px; line-height: 1.5; }
+
         .security-tips-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px; }
         .security-tip-card { background:rgba(0,0,0,0.3); border-radius:10px; padding:25px; border-left:5px solid var(--blue); transition:0.3s; }
         .security-tip-card:hover { transform:translateY(-5px); }
@@ -305,6 +370,17 @@
             .sticky-notes-grid { grid-template-columns:1fr; }
             .music-visualizer { right: 70px; }
             .music-player-btn { width: 50px; height: 50px; font-size: 1.5rem; }
+            .donate-presets { grid-template-columns: repeat(3, 1fr); }
+            .profile-section-top {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .profile-section-top .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .donate-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -363,7 +439,47 @@
         </div>
     </div>
 
-    <!-- 自定义右键菜单 -->
+    <!-- 捐款弹窗 -->
+    <div class="donate-modal" id="donateModal">
+        <div class="donate-card">
+            <button class="donate-close" id="closeDonateModal"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-heart" style="color:#e84393"></i> 支持阳光森林</h3>
+            <p class="donate-subtitle">感谢您的支持，您的每一份心意都是动力</p>
+
+            <div class="donate-presets" id="donatePresets">
+                <button class="preset" data-amount="5">¥5</button>
+                <button class="preset" data-amount="10">¥10</button>
+                <button class="preset" data-amount="20">¥20</button>
+                <button class="preset" data-amount="50">¥50</button>
+                <button class="preset" data-amount="100">¥100</button>
+            </div>
+
+            <div class="donate-form-group">
+                <label>捐款金额（元）</label>
+                <input type="number" id="donateAmount" step="0.01" min="0.01" value="10">
+            </div>
+
+            <div class="donate-form-group">
+                <label>支付方式</label>
+                <div class="donate-pay-methods">
+                    <label class="pay-method">
+                        <input type="radio" name="donatePay" value="alipay" checked>
+                        <span class="pay-icon" style="color:#1677ff"><i class="fab fa-alipay"></i> 支付宝</span>
+                    </label>
+                    <label class="pay-method">
+                        <input type="radio" name="donatePay" value="wxpay">
+                        <span class="pay-icon" style="color:#07c160"><i class="fab fa-weixin"></i> 微信支付</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="donate-submit" id="donateSubmit">
+                <i class="fas fa-heart"></i> 确认捐款
+            </button>
+            <div class="donate-tip">捐款为纯自愿行为，感谢您的支持！</div>
+        </div>
+    </div>
+
     <div class="custom-context-menu" id="customContextMenu">
         <div class="ctx-item" data-action="viewSource"><i class="fas fa-code"></i> 查看源代码</div>
         <div class="ctx-item" data-action="copy"><i class="fas fa-copy"></i> 复制</div>
@@ -371,7 +487,6 @@
         <div class="ctx-item" data-action="downloadImage"><i class="fas fa-download"></i> 下载图片</div>
     </div>
 
-    <!-- 轻提示 -->
     <div class="site-toast" id="siteToast"></div>
 
     <audio id="bgMusic" preload="auto" crossorigin="anonymous" style="display:none;"></audio>
@@ -392,7 +507,7 @@
             <div class="home-buttons"><button class="circular-action-btn" id="exploreBtn"><span>开始探索</span></button></div>
             <div class="home-footer">
                 <div class="footer-row">
-                    <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V3.1</div>
+                    <div class="home-footer-copyright">阳光森林 © 2026 版权所有 V3.3</div>
                     <a href="#" class="admin-link" id="adminBtn"><i class="fas fa-user-shield"></i> 管理员通道</a>
                 </div>
             </div>
@@ -402,7 +517,15 @@
     <div id="explore-page">
         <div class="explore-container">
             <div class="explore-header"><h1 class="explore-title">阳光森林 - 网络安全空间</h1><a href="#" class="back-to-home" id="backToHome"><i class="fas fa-arrow-left"></i> 返回主页</a></div>
-            <div class="profile-section" id="profileSection"></div>
+
+            <div class="profile-section">
+                <div class="profile-section-top">
+                    <div class="profile-header" id="profileHeaderInner"></div>
+                    <button class="donate-btn" id="donateBtn"><i class="fas fa-heart"></i> 支持我</button>
+                </div>
+                <div class="profile-content" id="profileContentInner"></div>
+            </div>
+
             <div class="articles-section">
                 <h2 class="section-title">文章</h2>
                 <div class="sticky-notes-grid">
@@ -436,7 +559,7 @@
             <div class="friend-links-container" id="friendLinksContainer"><h3>友情链接</h3></div>
             <div class="explore-footer">
                 <div class="footer-row">
-                    <p>阳光森林 © 2026 版权所有 V3.1</p>
+                    <p>阳光森林 © 2026 版权所有 V3.3</p>
                     <a href="#" class="admin-link" id="adminBtnExplore"><i class="fas fa-user-shield"></i> 管理员通道</a>
                 </div>
             </div>
@@ -466,8 +589,15 @@
                 { name: "ZHDD空间", url: "https://zhdd.bbroot.com" },
                 { name: "小满工作室", url: "https://xiaomanstudio.cn" }
             ],
-            system: { copyright: "阳光森林 © 2026 版权所有 V3.1" }
+            system: { copyright: "阳光森林 © 2026 版权所有 V3.3" }
         };
+
+        // ==================== 捐款配置 ====================
+        const DONATE_API_URL = 'https://xd.xileu.xyz/submit.php';
+        const DONATE_PID = '706548';
+        const DONATE_KEY = 'ff6dec476a57fb11388a395c13fbce13';
+        const DONATE_NOTIFY_URL = 'https://apipay.ygsl.us.ci/notify';
+        const DONATE_RETURN_URL = location.origin + location.pathname;
 
         // ==================== 轻提示 ====================
         function showToast(msg) {
@@ -521,7 +651,7 @@
             if (e.target === docModal) docModal.classList.remove('active');
         });
 
-        // ==================== 名言库（从 quotes.docx 加载） ====================
+        // ==================== 名言库 ====================
         let quoteLibrary = [];
 
         async function loadQuotes() {
@@ -547,7 +677,7 @@
             document.getElementById('quoteAuthor').textContent = '—— ' + quoteLibrary[i].author;
         }
 
-        // ==================== 音乐系统（V3.1 修复版） ====================
+        // ==================== 音乐系统 ====================
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicPlayerBtn');
         const visualizer = document.getElementById('musicVisualizer');
@@ -577,7 +707,6 @@
             visualizer.classList.add('hidden');
         }
 
-        // 只建一次 AudioContext 与 source → analyser → destination 链路
         function initAudioContext() {
             if (audioCtx) {
                 if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
@@ -585,22 +714,17 @@
             }
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 256;
                 analyser.smoothingTimeConstant = 0.75;
-
                 gainNode = audioCtx.createGain();
                 gainNode.gain.value = 1;
-
                 if (!sourceNode) {
                     sourceNode = audioCtx.createMediaElementSource(bgMusic);
                 }
-                // source → analyser → gain → destination
                 sourceNode.connect(analyser);
                 analyser.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
-
                 if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
                 console.log('✅ AudioContext 初始化完成, state:', audioCtx.state);
             } catch (e) {
@@ -616,10 +740,8 @@
                 return;
             }
             visualizer.classList.remove('hidden');
-
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
             analyser.getByteFrequencyData(dataArray);
-
             const step = Math.floor(dataArray.length / barCount);
             for (let i = 0; i < barCount; i++) {
                 const value = dataArray[i * step] || 0;
@@ -687,25 +809,20 @@
             return arr;
         }
 
-        // 关键修复：先建链路，等 canplay，再 play
         function playMusicAtIndex(index) {
             if (musicFiles.length === 0) return;
             currentMusicIndex = ((index % musicFiles.length) + musicFiles.length) % musicFiles.length;
 
-            // 1. 确保音频链路已建好，且 ctx 处于 running
             initAudioContext();
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume().catch(() => {});
             }
 
-            // 2. 设置新歌
             bgMusic.src = musicFiles[currentMusicIndex];
             bgMusic.loop = false;
 
-            // 3. 等 canplay 再 play，避免 analyser 读到空数据
             const onCanPlay = () => {
                 bgMusic.removeEventListener('canplay', onCanPlay);
-
                 const p = bgMusic.play();
                 if (p && p.then) {
                     p.then(() => {
@@ -792,6 +909,163 @@
             startVisualizer();
         });
 
+        // ==================== 捐款功能 ====================
+        const donateModal = document.getElementById('donateModal');
+        const donateBtn = document.getElementById('donateBtn');
+        const closeDonateModal = document.getElementById('closeDonateModal');
+        const donateAmountInput = document.getElementById('donateAmount');
+        const donateSubmit = document.getElementById('donateSubmit');
+        const donatePresets = document.getElementById('donatePresets');
+
+        function openDonateModal() {
+            donateModal.classList.add('active');
+            setTimeout(() => document.getElementById('donateAmount').focus(), 100);
+        }
+
+        function closeDonateModalFn() {
+            donateModal.classList.remove('active');
+        }
+
+        donateBtn.addEventListener('click', openDonateModal);
+        closeDonateModal.addEventListener('click', closeDonateModalFn);
+        donateModal.addEventListener('click', (e) => {
+            if (e.target === donateModal) closeDonateModalFn();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDonateModalFn();
+        });
+
+        donatePresets.querySelectorAll('.preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const amt = btn.dataset.amount;
+                donateAmountInput.value = amt;
+                donatePresets.querySelectorAll('.preset').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+        donateAmountInput.addEventListener('input', () => {
+            const v = donateAmountInput.value;
+            donatePresets.querySelectorAll('.preset').forEach(b => {
+                b.classList.toggle('active', b.dataset.amount === v);
+            });
+        });
+
+        donateSubmit.addEventListener('click', () => {
+            const amount = parseFloat(donateAmountInput.value);
+            if (!amount || amount <= 0 || isNaN(amount)) {
+                showToast('请输入有效金额');
+                return;
+            }
+            if (amount < 0.01) {
+                showToast('最低捐款 0.01 元');
+                return;
+            }
+            const type = document.querySelector('input[name="donatePay"]:checked').value;
+
+            const out_trade_no = 'DONATE_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8).toUpperCase();
+            const name = '支持-阳光森林';
+            const money = amount.toFixed(2);
+
+            const params = {
+                pid: DONATE_PID,
+                type: type,
+                out_trade_no: out_trade_no,
+                name: name,
+                money: money,
+                notify_url: DONATE_NOTIFY_URL,
+                return_url: DONATE_RETURN_URL
+            };
+
+            const sortedKeys = Object.keys(params).sort();
+            let signStr = '';
+            sortedKeys.forEach(k => {
+                if (params[k] !== '' && params[k] !== null && params[k] !== undefined) {
+                    signStr += k + '=' + params[k] + '&';
+                }
+            });
+            signStr = signStr.slice(0, -1);
+            const signStrWithKey = signStr + DONATE_KEY;
+            const sign = md5(signStrWithKey).toLowerCase();
+
+            params.sign = sign;
+            params.sign_type = 'MD5';
+
+            console.log('捐款参数:', params);
+            console.log('签名串:', signStrWithKey);
+            console.log('签名:', sign);
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = DONATE_API_URL;
+            form.target = '_blank';
+
+            for (const k in params) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = k;
+                input.value = params[k];
+                form.appendChild(input);
+            }
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            showToast('正在跳转支付...');
+            closeDonateModalFn();
+        });
+
+        // ==================== 支付返回处理 ====================
+        function handlePaymentReturn() {
+            const params = new URLSearchParams(location.search);
+            const tradeStatus = params.get('trade_status');
+            const outTradeNo = params.get('out_trade_no');
+            const money = params.get('money');
+            const tradeNo = params.get('trade_no');
+
+            if (!tradeStatus || !outTradeNo) return;
+
+            const cleanUrl = location.origin + location.pathname;
+            history.replaceState(null, '', cleanUrl);
+
+            if (tradeStatus === 'TRADE_SUCCESS') {
+                showThankYouModal(money, outTradeNo, tradeNo);
+            } else {
+                showToast('支付未完成，状态：' + tradeStatus);
+            }
+        }
+
+        function showThankYouModal(money, outTradeNo, tradeNo) {
+            const overlay = document.createElement('div');
+            overlay.className = 'donate-modal active';
+            overlay.innerHTML = `
+                <div class="donate-card" style="text-align:center;">
+                    <div style="font-size:4rem; color:#2ecc71; margin-bottom:10px;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 style="color:#2ecc71;">感谢您的支持！</h3>
+                    <p class="donate-subtitle" style="margin-top:12px;">
+                        您已成功捐款 <strong style="color:#e84393;font-size:1.3rem;">¥${money || '—'}</strong>
+                    </p>
+                    <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:14px;margin:18px 0;font-size:0.82rem;color:#aaa;text-align:left;line-height:1.8;word-break:break-all;">
+                        <div>商户订单：${outTradeNo || '—'}</div>
+                        <div>平台订单：${tradeNo || '—'}</div>
+                    </div>
+                    <button class="donate-submit" id="thankYouClose" style="margin-top:0;">
+                        <i class="fas fa-heart"></i> 关闭
+                    </button>
+                    <div class="donate-tip">您的每一份心意，都是阳光森林继续生长的养分 🌱</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            const close = () => overlay.remove();
+            overlay.querySelector('#thankYouClose').addEventListener('click', close);
+            overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+            document.addEventListener('keydown', function esc(e) {
+                if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+            });
+        }
+
         // ==================== 自定义右键菜单 ====================
         function setupRightClick() {
             const menu = document.getElementById('customContextMenu');
@@ -828,7 +1102,6 @@
 
                 if (action === 'viewSource') {
                     window.open('view-source:' + location.href, '_blank');
-
                 } else if (action === 'copy') {
                     const sel = window.getSelection().toString();
                     const text = sel || location.href;
@@ -846,7 +1119,6 @@
                         document.body.removeChild(ta);
                         showToast('已复制');
                     }
-
                 } else if (action === 'downloadImage') {
                     if (!currentImg) return;
                     const src = currentImg.src;
@@ -1081,7 +1353,15 @@
         function updateAllPages() {
             document.querySelector('#home-page .home-footer-copyright').textContent = defaultSettings.system.copyright;
             document.querySelector('#explore-page .explore-footer p').textContent = defaultSettings.system.copyright;
-            document.getElementById('profileSection').innerHTML = `<div class="profile-header"><div class="profile-avatar"><img src="${defaultSettings.profile.avatar}" alt="头像"></div><div class="profile-info"><h2>${defaultSettings.profile.name}</h2><p>${defaultSettings.profile.tagline}</p></div></div><div class="profile-content">${defaultSettings.profile.description.split('\n').map(p => `<p>${p}</p>`).join('')}</div>`;
+
+            // 个人介绍：拆成两部分填充
+            document.getElementById('profileHeaderInner').innerHTML =
+                `<div class="profile-avatar"><img src="${defaultSettings.profile.avatar}" alt="头像"></div>` +
+                `<div class="profile-info"><h2>${defaultSettings.profile.name}</h2><p>${defaultSettings.profile.tagline}</p></div>`;
+
+            document.getElementById('profileContentInner').innerHTML =
+                defaultSettings.profile.description.split('\n').map(p => `<p>${p}</p>`).join('');
+
             document.getElementById('securityTipsListContainer').innerHTML = defaultSettings.securityTips.map(t => `<div class="security-tip-card"><h4><i class="fas fa-shield-alt"></i> ${t.title}</h4><p>${t.content}</p></div>`).join('');
             document.getElementById('contactButtonsContainer').innerHTML = defaultSettings.contacts.map(c => {
                 if (c.qrcode) {
@@ -1139,6 +1419,7 @@
             setupRightClick();
             await loadQuotes();
             agreementOverlay.style.display = 'flex';
+            handlePaymentReturn();
         });
     </script>
 </body>
